@@ -6,6 +6,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
+import 'password_input.dart';
 import 'player_page.dart';
 
 class GamePage extends StatefulWidget {
@@ -159,69 +160,29 @@ class _GamePageState extends State<GamePage> {
   }
 
   /* Open the player, using a password prompt if they have a password. */
-  _openPlayer(Player player) {
+  _openPlayer(Player player) async {
     if (player.password.isEmpty) {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => PlayerPage(gameKey: gameKey, playerId: player.id)));
       return;
     }
-    TextEditingController passwordController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Enter Password'),
-          contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const Padding(
-                    padding: EdgeInsets.only(right: 12),
-                    child: Text('Password:'),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      autofocus: true,
-                      controller: passwordController,
-                      obscureText: true,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text('Submit'),
-              onPressed: () {
-                String password = passwordController.value.text;
-                if (password != player.password) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Incorrect password.'),
-                    duration: Duration(milliseconds: 2000),
-                  ));
-                } else {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PlayerPage(gameKey: gameKey, playerId: player.id)),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
+    String? password = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
     );
+    if (password == null) {
+      return;
+    } else if (password != player.password) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Incorrect password.'),
+        duration: Duration(milliseconds: 2000),
+      ));
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PlayerPage(gameKey: gameKey, playerId: player.id)),
+      );
+    }
   }
 
   Widget _businessChip(Business business, Player player) {

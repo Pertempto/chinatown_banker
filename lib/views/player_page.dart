@@ -6,6 +6,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
+import 'password_input.dart';
 import 'shop_type_selector.dart';
 
 class PlayerPage extends StatefulWidget {
@@ -285,86 +286,33 @@ class _PlayerPageState extends State<PlayerPage> {
   }
 
   /* Allow the player to edit their password. */
-  _editPassword(Game game, Player player, BuildContext context) {
-    TextEditingController oldPasswordController = TextEditingController();
-    TextEditingController newPasswordController = TextEditingController();
-    bool hasPassword = player.password.isNotEmpty;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Change Password'),
-          contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (hasPassword)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.only(right: 12),
-                      child: Text('Old Password:'),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        autofocus: true,
-                        controller: oldPasswordController,
-                        obscureText: true,
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const Padding(
-                    padding: EdgeInsets.only(right: 12),
-                    child: Text('New Password:'),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      autofocus: !hasPassword,
-                      controller: newPasswordController,
-                      obscureText: true,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text('Submit'),
-              onPressed: () {
-                String oldPassword = oldPasswordController.value.text;
-                String newPassword = newPasswordController.value.text;
-                if (oldPassword != player.password) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Incorrect old password.'),
-                    duration: Duration(milliseconds: 2000),
-                  ));
-                } else {
-                  game.changePlayerPassword(player, newPassword);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Password changed successfully!'),
-                    duration: Duration(milliseconds: 2000),
-                  ));
-                }
-              },
-            ),
-          ],
-        );
-      },
+  _editPassword(Game game, Player player, BuildContext context) async {
+    if (player.password.isNotEmpty) {
+      String? password = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
+      );
+      if (password == null) {
+        return;
+      } else if (password != player.password) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Incorrect password.'),
+          duration: Duration(milliseconds: 2000),
+        ));
+        return;
+      }
+    }
+    String? newPassword = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: true)),
     );
+    if (newPassword != null) {
+      game.changePlayerPassword(player, newPassword);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Password changed successfully!'),
+        duration: Duration(milliseconds: 2000),
+      ));
+    }
   }
 
   /* Allow the user to select a player and amount to transfer */
