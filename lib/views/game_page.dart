@@ -72,40 +72,52 @@ class _GamePageState extends State<GamePage> {
                         ),
                       ),
                     ),
-                    ...game.players.values.map((p) {
-                      Iterable<Business> businesses = game.playerBusinesses(p).values;
+                    ...game.players.values.map((player) {
+                      Iterable<Business> businesses = game.playerBusinesses(player).values;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: GestureDetector(
-                          onTap: () => _openPlayer(p),
+                          onTap: () => _openPlayer(player),
                           child: Container(
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(8)),
-                              color: Color(p.colorValue),
+                              border: Border.all(width: 2, color: Colors.grey),
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(mainAxisSize: MainAxisSize.min, children: [
-                                  Text(p.name, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: Color(player.colorValue),
+                                      borderRadius: const BorderRadius.all(Radius.circular(16)),
+                                      border: Border.all(
+                                        width: 1,
+                                        color:
+                                            Color(player.colorValue) == Colors.white ? Colors.grey : Colors.transparent,
+                                      ),
+                                      // color: Color(player.colorValue),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(player.name, style: textTheme.headline4),
                                   const Spacer(),
-                                  Text(businesses.length.toString(),
-                                      style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
-                                  const SizedBox(width: 8),
-                                  Icon(MdiIcons.domain, color: colorScheme.onPrimary),
+                                  // Text(businesses.length.toString(), style: textTheme.headline5),
+                                  // const SizedBox(width: 8),
+                                  // const Icon(MdiIcons.domain),
                                 ]),
-                                if (!game.isStarted)
-                                  Text('Tap to edit',
-                                      style: textTheme.subtitle1!.copyWith(color: colorScheme.onPrimary)),
+                                if (!game.isStarted) Text('Tap to edit', style: textTheme.subtitle1),
                                 if (game.isStarted && businesses.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Wrap(
                                       spacing: 4,
                                       alignment: WrapAlignment.start,
-                                      children: businesses.map((b) => _businessChip(b, p)).toList(),
+                                      children: businesses.map((b) => _businessChip(b, player)).toList(),
                                     ),
                                   ),
                               ],
@@ -189,7 +201,7 @@ class _GamePageState extends State<GamePage> {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Chip(
-      label: Text(business.toString(), style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+      label: Text(business.toString(), style: textTheme.bodyText1),
       visualDensity: VisualDensity.compact,
       backgroundColor: Color(player.colorValue),
       side: const BorderSide(color: Colors.white, width: 1, style: BorderStyle.solid),

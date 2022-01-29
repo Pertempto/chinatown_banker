@@ -66,34 +66,36 @@ class _PlayerPageState extends State<PlayerPage> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.all(Radius.circular(8)),
-                        color: Color(player.colorValue),
+                        border: Border.all(width: 2, color: Colors.grey),
                       ),
                       child: Row(
                         children: [
-                          Text(player.name, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                          GestureDetector(
+                            onTap: () => game.changePlayerColor(player),
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Color(player.colorValue),
+                                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Color(player.colorValue) == Colors.white ? Colors.grey : Colors.transparent,
+                                ),
+                                // color: Color(player.colorValue),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          GestureDetector(
+                            onTap: () => _editName(game, player, context),
+                            child: Text(player.name, style: textTheme.headline4),
+                          ),
                           const Spacer(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(MdiIcons.pencil),
-                                onPressed: () => _editName(game, player, context),
-                                tooltip: 'Change Name',
-                                color: colorScheme.onPrimary,
-                              ),
-                              IconButton(
-                                icon: const Icon(MdiIcons.palette),
-                                onPressed: () => game.changePlayerColor(player),
-                                tooltip: 'Change Color',
-                                color: colorScheme.onPrimary,
-                              ),
-                              IconButton(
-                                icon: const Icon(MdiIcons.lock),
-                                onPressed: () => _editPassword(game, player, context),
-                                tooltip: 'Change Password',
-                                color: colorScheme.onPrimary,
-                              ),
-                            ],
+                          IconButton(
+                            icon: const Icon(MdiIcons.lock),
+                            onPressed: () => _editPassword(game, player, context),
+                            tooltip: 'Change Password',
                           ),
                         ],
                       ),

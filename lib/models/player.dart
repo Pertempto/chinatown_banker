@@ -16,24 +16,17 @@ String _randomKey() {
   return id;
 }
 
-List<MaterialColor> playerColors = [
-  Colors.brown,
-  Colors.deepPurple,
+List<Color> playerColors = [
+  Colors.red,
   Colors.purple,
-  Colors.indigo,
-  Colors.blue,
-  Colors.lightBlue,
-  Colors.cyan,
-  Colors.teal,
+  Colors.yellow,
   Colors.green,
-  Colors.lightGreen,
-  Colors.orange,
-  Colors.deepOrange,
+  Colors.white,
 ];
 
 Color _randomColor() {
   Random rand = Random();
-  return playerColors[rand.nextInt(playerColors.length)].shade500;
+  return playerColors[rand.nextInt(playerColors.length)];
 }
 
 @HiveType(typeId: 2)
