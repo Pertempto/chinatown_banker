@@ -9,6 +9,20 @@ import '../models/player.dart';
 import 'password_input.dart';
 import 'shop_type_selector.dart';
 
+const List<List<int>> board = [
+  [00, 01, 02, 00, 00, 16, 17, 18, 00, 28, 29, 30, 00, 43, 44, 45, 46],
+  [00, 03, 04, 05, 00, 19, 20, 21, 00, 31, 29, 30, 00, 43, 44, 45, 50],
+  [06, 07, 08, 09, 00, 22, 23, 00, 00, 34, 29, 30, 00, 43, 44, 45, 54],
+  [10, 11, 12, 00, 00, 24, 25, 00, 00, 00, 29, 30, 39, 00, 00, 45, 56],
+  [13, 14, 05, 00, 00, 26, 27, 00, 00, 00, 29, 30, 42, 00, 00, 45, 58],
+  [00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00],
+  [00, 00, 00, 00, 00, 00, 59, 60, 00, 00, 00, 71, 72, 73, 74, 00, 00],
+  [00, 00, 00, 00, 00, 00, 61, 62, 00, 00, 00, 75, 76, 77, 78, 00, 00],
+  [00, 00, 00, 00, 00, 00, 63, 64, 65, 00, 00, 79, 80, 81, 82, 00, 00],
+  [00, 00, 00, 00, 00, 00, 66, 67, 68, 00, 00, 83, 84, 85, 00, 00, 00],
+  [00, 00, 00, 00, 00, 00, 00, 69, 70, 00, 00, 00, 00, 00, 00, 00, 00],
+];
+
 class PlayerPage extends StatefulWidget {
   final int gameKey;
   final String playerId;
@@ -23,7 +37,11 @@ class _PlayerPageState extends State<PlayerPage> {
   late int gameKey = widget.gameKey;
   late String playerId = widget.playerId;
   final Box<Game> gamesBox = Hive.box('games');
+  bool editSelected = false;
+  bool editLocked = false;
   bool showCash = false;
+
+  bool get editMode => editSelected || editLocked;
 
   @override
   Widget build(BuildContext context) {
@@ -33,163 +51,14 @@ class _PlayerPageState extends State<PlayerPage> {
       valueListenable: gamesBox.listenable(keys: [gameKey]),
       builder: (context, box, widget) {
         Game game = box.get(gameKey);
+        editLocked = !game.isStarted;
         Player? player = game.players[playerId];
         if (player == null) {
           return Container();
         }
-        int cash = game.playerCash(player);
-        Iterable<Business> businesses = game.playerBusinesses(player).values;
         List<Widget> children = [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                border: Border.all(width: 2, color: Colors.grey),
-              ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => game.changePlayerColor(player),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: player.colorValue,
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
-                        border: Border.all(
-                          width: 1,
-                          color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
-                        ),
-                        // color: Color(player.colorValue),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  GestureDetector(
-                    onTap: () => _editName(game, player, context),
-                    child: Text(player.name, style: textTheme.headline4),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(MdiIcons.lock),
-                    onPressed: () => _editPassword(game, player, context),
-                    tooltip: 'Change Password',
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: GestureDetector(
-              onTapDown: (_) {
-                setState(() => showCash = true);
-              },
-              onTapCancel: () {
-                setState(() => showCash = false);
-              },
-              onTapUp: (_) {
-                setState(() => showCash = false);
-              },
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  color: Colors.green.shade700,
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
-                        const Spacer(),
-                        if (!showCash)
-                          Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                        if (showCash)
-                          Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
-                        ),
-                      ],
-                    ),
-                    if (showCash)
-                      Row(
-                        children: [
-                          Expanded(flex: 1, child: Container()),
-                          Expanded(
-                            flex: 6,
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: Column(
-                                children: game
-                                    .playerCashHistory(player)
-                                    .map((e) => Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(e.title,
-                                                style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                                            const Spacer(),
-                                            Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
-                                                style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                                          ],
-                                        ))
-                                    .toList(),
-                              ),
-                            ),
-                          ),
-                          Expanded(flex: 1, child: Container()),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (true) //game.isPlaying && cash > 0)
-            _item(
-                title: 'Transfer Cash', onTap: () => _transferMoney(game, player), iconData: MdiIcons.bankTransferOut),
-          ...businesses.map((business) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    color: business.color,
-                  ),
-                  child: Row(
-                    children: [
-                      Text(business.name, style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
-                      const SizedBox(width: 12),
-                      Text('(${business.size}/${business.maxSize})',
-                          style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(MdiIcons.plus),
-                        onPressed: business.size >= business.maxSize || game.isComplete
-                            ? null
-                            : () => game.addShop(player, business),
-                        color: colorScheme.onPrimary,
-                      ),
-                      IconButton(
-                        icon: const Icon(MdiIcons.minus),
-                        onPressed: game.isComplete ? null : () => game.removeShop(player, business),
-                        color: colorScheme.onPrimary,
-                      ),
-                    ],
-                  ),
-                ),
-              )),
-          if (game.isPlaying)
-            OutlinedButton(
-              onPressed: () => _addBusiness(game, player),
-              child: const Text('Add Business'),
-            ),
+          if (!editMode) ..._viewWidgets(game, player),
+          if (editMode) ..._editWidgets(game, player),
         ];
         return Scaffold(
           body: CustomScrollView(
@@ -198,20 +67,56 @@ class _PlayerPageState extends State<PlayerPage> {
                   pinned: true,
                   snap: false,
                   floating: false,
-                  expandedHeight: 160.0,
-                  backgroundColor: player.colorValue,
-                  iconTheme: IconThemeData(color: player.contrastColor),
+                  expandedHeight: 360.0,
                   flexibleSpace: FlexibleSpaceBar(
-                    title: Text(player.name, style: textTheme.headline6!.copyWith(color: player.contrastColor)),
+                    title: Text(player.name),
+                    centerTitle: true,
+                    background: Container(
+                      padding: const EdgeInsets.fromLTRB(16, 96, 16, 0),
+                      width: double.infinity,
+                      alignment: Alignment.topCenter,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: List.generate(
+                          11,
+                          (y) => Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(
+                              17,
+                              (x) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(1),
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Container(
+                                      color: board[y][x] == 0 ? Colors.transparent : Colors.white,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        board[y][x] == 0 ? '' : board[y][x].toString(),
+                                        style: textTheme.subtitle2,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   actions: [
-                    if (!game.isStarted)
+                    if (editSelected)
                       IconButton(
-                        icon: const Icon(MdiIcons.delete),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          game.deletePlayer(player);
-                        },
+                        icon: const Icon(MdiIcons.eye),
+                        onPressed: () => setState(() => editSelected = false),
+                      ),
+                    if (!editSelected && !editLocked)
+                      IconButton(
+                        icon: const Icon(MdiIcons.pencil),
+                        onPressed: () => setState(() => editSelected = true),
                       ),
                   ]),
               SliverPadding(
@@ -225,6 +130,220 @@ class _PlayerPageState extends State<PlayerPage> {
         );
       },
     );
+  }
+
+  /* Get the widgets for the view mode. */
+  List<Widget> _viewWidgets(Game game, Player player) {
+    int cash = game.playerCash(player);
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    Iterable<Business> businesses = game.playerBusinesses(player).values;
+    return [
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: GestureDetector(
+          onTapDown: (_) => setState(() => showCash = true),
+          onTapCancel: () => setState(() => showCash = false),
+          onTapUp: (_) => setState(() => showCash = false),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              color: Colors.green.shade700,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                    const Spacer(),
+                    if (!showCash)
+                      Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                    if (showCash)
+                      Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
+                    ),
+                  ],
+                ),
+                if (showCash)
+                  Row(
+                    children: [
+                      Expanded(flex: 1, child: Container()),
+                      Expanded(
+                        flex: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Column(
+                            children: game
+                                .playerCashHistory(player)
+                                .map((e) => Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(e.title,
+                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                        const Spacer(),
+                                        Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
+                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                      ],
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      ),
+                      Expanded(flex: 1, child: Container()),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      if (game.isPlaying && cash > 0)
+        _item(
+          title: 'Transfer Cash',
+          backgroundColor: Colors.blue.shade700,
+          iconData: MdiIcons.bankTransferOut,
+          onTap: () => _transferMoney(game, player),
+        ),
+      ...businesses.map((business) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                color: business.color,
+              ),
+              child: Row(
+                children: [
+                  Text(business.name, style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                  const SizedBox(width: 12),
+                  Text('(${business.size}/${business.maxSize})',
+                      style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(MdiIcons.plus),
+                    onPressed: business.size >= business.maxSize || game.isComplete
+                        ? null
+                        : () => game.addShop(player, business),
+                    color: colorScheme.onPrimary,
+                  ),
+                  IconButton(
+                    icon: const Icon(MdiIcons.minus),
+                    onPressed: game.isComplete ? null : () => game.removeShop(player, business),
+                    color: colorScheme.onPrimary,
+                  ),
+                ],
+              ),
+            ),
+          )),
+      if (game.isPlaying)
+        OutlinedButton(
+          onPressed: () => _addBusiness(game, player),
+          child: const Text('Add Business'),
+        ),
+    ];
+  }
+
+  /* Get a list item widget for the player's list. */
+  Widget _item(
+      {required String title,
+      required Color backgroundColor,
+      IconData? iconData,
+      Widget? trailing,
+      String? subtitle,
+      VoidCallback? onTap}) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            color: backgroundColor,
+          ),
+          child: Row(
+            children: [
+              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+              const Spacer(),
+              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+              if (iconData != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Icon(iconData, color: colorScheme.onPrimary, size: 32),
+                ),
+              if (trailing != null) trailing,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /* Get an outlined list item widget for the player's list. */
+  Widget _outlinedItem(
+      {required String title, IconData? iconData, Widget? trailing, String? subtitle, VoidCallback? onTap}) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            border: Border.all(width: 2, color: Colors.grey),
+          ),
+          child: Row(
+            children: [
+              Text(title, style: textTheme.headline4),
+              const Spacer(),
+              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1),
+              if (iconData != null) Padding(padding: const EdgeInsets.all(16), child: Icon(iconData, size: 32)),
+              if (trailing != null) trailing,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _editWidgets(Game game, Player player) {
+    return [
+      _outlinedItem(
+        title: player.name,
+        subtitle: 'Tap to edit',
+        iconData: MdiIcons.accountCowboyHat,
+        onTap: () => _editName(game, player, context),
+      ),
+      _outlinedItem(
+        title: 'Color',
+        subtitle: 'Tap to change',
+        trailing: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: player.color,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            border: Border.all(
+              width: 1,
+              color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
+            ),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+        onTap: () => setState(() => game.changePlayerColor(player)),
+      ),
+    ];
   }
 
   /* Allow the player to edit their name. */
@@ -379,37 +498,5 @@ class _PlayerPageState extends State<PlayerPage> {
     if (shopType != null) {
       game.addBusiness(player, shopType);
     }
-  }
-
-  /* Get a list item widget for the player's list. */
-  Widget _item({required String title, IconData? iconData, String? subtitle, VoidCallback? onTap}) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
-            color: Colors.blue.shade700,
-          ),
-          child: Row(
-            children: [
-              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
-              const Spacer(),
-              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-              if (iconData != null)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Icon(iconData, color: colorScheme.onPrimary, size: 32),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

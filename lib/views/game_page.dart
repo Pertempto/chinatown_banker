@@ -25,7 +25,6 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game'),
@@ -93,11 +92,11 @@ class _GamePageState extends State<GamePage> {
                                     width: 32,
                                     height: 32,
                                     decoration: BoxDecoration(
-                                      color: player.colorValue,
+                                      color: player.color,
                                       borderRadius: const BorderRadius.all(Radius.circular(16)),
                                       border: Border.all(
                                         width: 1,
-                                        color: player.colorValue == Colors.white ? Colors.grey : Colors.transparent,
+                                        color: player.color == Colors.white ? Colors.grey : Colors.transparent,
                                       ),
                                       // color: Color(player.colorValue),
                                     ),
@@ -198,11 +197,10 @@ class _GamePageState extends State<GamePage> {
 
   Widget _businessChip(Business business, Player player) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Chip(
       label: Text(business.toString(), style: textTheme.bodyText1),
       visualDensity: VisualDensity.compact,
-      backgroundColor: player.colorValue,
+      backgroundColor: player.color,
       side: const BorderSide(color: Colors.white, width: 1, style: BorderStyle.solid),
       padding: const EdgeInsets.all(0),
     );

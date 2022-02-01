@@ -21,7 +21,7 @@ class PlayerAdapter extends TypeAdapter<Player> {
       password: fields[2] as String,
     )
       ..id = fields[0] as String
-      ..color =
+      .._color =
           fields[4] == null ? PlayerColor.green : fields[4] as PlayerColor;
   }
 
@@ -36,7 +36,7 @@ class PlayerAdapter extends TypeAdapter<Player> {
       ..writeByte(2)
       ..write(obj.password)
       ..writeByte(4)
-      ..write(obj.color);
+      ..write(obj._color);
   }
 
   @override

@@ -30,7 +30,7 @@ class PlayerSelector extends StatelessWidget {
                             width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(8)),
-                              color: player.colorValue,
+                              color: player.color,
                             ),
                             child: Row(
                               children: [
