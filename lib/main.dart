@@ -13,6 +13,7 @@ void main() async {
   Hive.registerAdapter<Event>(EventAdapter());
   Hive.registerAdapter<EventType>(EventTypeAdapter());
   Hive.registerAdapter<Player>(PlayerAdapter());
+  Hive.registerAdapter<PlayerColor>(PlayerColorAdapter());
   Hive.registerAdapter<Business>(BusinessAdapter());
   Hive.registerAdapter<ShopType>(ShopTypeAdapter());
   await Hive.openBox<Game>('games');

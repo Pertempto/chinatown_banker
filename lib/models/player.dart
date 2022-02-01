@@ -16,19 +16,6 @@ String _randomKey() {
   return id;
 }
 
-List<Color> playerColors = [
-  Colors.red,
-  Colors.purple,
-  Colors.yellow,
-  Colors.green,
-  Colors.white,
-];
-
-Color _randomColor() {
-  Random rand = Random();
-  return playerColors[rand.nextInt(playerColors.length)];
-}
-
 @HiveType(typeId: 2)
 class Player extends HiveObject {
   @HiveField(0)
@@ -40,19 +27,61 @@ class Player extends HiveObject {
   @HiveField(2)
   String password;
 
-  @HiveField(3)
-  int colorValue;
+  @HiveField(4, defaultValue: PlayerColor.green)
+  PlayerColor color;
+
+  Color get colorValue => _color(color);
+  Color get contrastColor => _contrastColor(color);
 
   Player({required this.name, required this.password})
       : id = _randomKey(),
-        colorValue = _randomColor().value;
+        color = _randomColor();
 
   // Change the player's color to a different random color.
   changeColor() {
-    int newColorValue = colorValue;
-    while (newColorValue == colorValue) {
-      newColorValue = _randomColor().value;
+    PlayerColor newColorName = color;
+    while (newColorName == color) {
+      newColorName = _randomColor();
     }
-    colorValue = newColorValue;
+    color = newColorName;
   }
+}
+
+@HiveType(typeId: 7)
+enum PlayerColor {
+  @HiveField(0)
+  green,
+  @HiveField(1)
+  purple,
+  @HiveField(2)
+  red,
+  @HiveField(3)
+  white,
+  @HiveField(4)
+  yellow,
+}
+
+PlayerColor _randomColor() {
+  Random rand = Random();
+  return PlayerColor.values[rand.nextInt(PlayerColor.values.length)];
+}
+
+Color _color(PlayerColor color) {
+  return {
+    PlayerColor.green: Colors.green,
+    PlayerColor.purple: Colors.purple,
+    PlayerColor.red: Colors.red,
+    PlayerColor.white: Colors.white,
+    PlayerColor.yellow: Colors.yellow,
+  }[color] ?? Colors.black;
+}
+
+Color _contrastColor(PlayerColor color) {
+  return {
+    PlayerColor.green: Colors.white,
+    PlayerColor.purple: Colors.white,
+    PlayerColor.red: Colors.white,
+    PlayerColor.white: Colors.black,
+    PlayerColor.yellow: Colors.black,
+  }[color] ?? Colors.black;
 }

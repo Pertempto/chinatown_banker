@@ -39,205 +39,188 @@ class _PlayerPageState extends State<PlayerPage> {
         }
         int cash = game.playerCash(player);
         Iterable<Business> businesses = game.playerBusinesses(player).values;
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Player'),
-            actions: [
-              if (!game.isStarted)
-                IconButton(
-                  icon: const Icon(MdiIcons.delete),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    game.deletePlayer(player);
-                  },
-                ),
-            ],
-          ),
-          body: SingleChildScrollView(
+        List<Widget> children = [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
             child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              child: Column(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                border: Border.all(width: 2, color: Colors.grey),
+              ),
+              child: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                  GestureDetector(
+                    onTap: () => game.changePlayerColor(player),
                     child: Container(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                      width: double.infinity,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
-                        border: Border.all(width: 2, color: Colors.grey),
-                      ),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => game.changePlayerColor(player),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Color(player.colorValue),
-                                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                border: Border.all(
-                                  width: 1,
-                                  color: Color(player.colorValue) == Colors.white ? Colors.grey : Colors.transparent,
-                                ),
-                                // color: Color(player.colorValue),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          GestureDetector(
-                            onTap: () => _editName(game, player, context),
-                            child: Text(player.name, style: textTheme.headline4),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            icon: const Icon(MdiIcons.lock),
-                            onPressed: () => _editPassword(game, player, context),
-                            tooltip: 'Change Password',
-                          ),
-                        ],
+                        color: player.colorValue,
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        border: Border.all(
+                          width: 1,
+                          color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
+                        ),
+                        // color: Color(player.colorValue),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: GestureDetector(
-                      onTapDown: (_) {
-                        setState(() => showCash = true);
-                      },
-                      onTapCancel: () {
-                        setState(() => showCash = false);
-                      },
-                      onTapUp: (_) {
-                        setState(() => showCash = false);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(8)),
-                          color: Colors.green.shade700,
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
-                                const Spacer(),
-                                if (!showCash)
-                                  Text('Press to view',
-                                      style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                                if (showCash)
-                                  Text('\$${cash}k',
-                                      style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
-                                Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
-                                ),
-                              ],
-                            ),
-                            if (showCash)
-                              Row(
-                                children: [
-                                  Expanded(flex: 1, child: Container()),
-                                  Expanded(
-                                    flex: 6,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 12),
-                                      child: Column(
-                                        children: game
-                                            .playerCashHistory(player)
-                                            .map((e) => Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text(e.title,
-                                                        style: textTheme.bodyText1!
-                                                            .copyWith(color: colorScheme.onPrimary)),
-                                                    const Spacer(),
-                                                    Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
-                                                        style: textTheme.bodyText1!
-                                                            .copyWith(color: colorScheme.onPrimary)),
-                                                  ],
-                                                ))
-                                            .toList(),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(flex: 1, child: Container()),
-                                ],
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: () => _editName(game, player, context),
+                    child: Text(player.name, style: textTheme.headline4),
                   ),
-                  if (game.isPlaying && cash > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: GestureDetector(
-                        onTap: () => _transferMoney(game, player),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(8)),
-                            color: Colors.blue.shade700,
-                          ),
-                          child: Row(
-                            children: [
-                              Text('Transfer Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
-                              const Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Icon(MdiIcons.bankTransferOut, color: colorScheme.onPrimary, size: 32),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ...businesses.map((business) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(8)),
-                            color: business.color,
-                          ),
-                          child: Row(
-                            children: [
-                              Text(business.name, style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
-                              const SizedBox(width: 12),
-                              Text('(${business.size}/${business.maxSize})',
-                                  style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-                              const Spacer(),
-                              IconButton(
-                                icon: const Icon(MdiIcons.plus),
-                                onPressed: business.size >= business.maxSize || game.isComplete
-                                    ? null
-                                    : () => game.addShop(player, business),
-                                color: colorScheme.onPrimary,
-                              ),
-                              IconButton(
-                                icon: const Icon(MdiIcons.minus),
-                                onPressed: game.isComplete ? null : () => game.removeShop(player, business),
-                                color: colorScheme.onPrimary,
-                              ),
-                            ],
-                          ),
-                        ),
-                      )),
-                  if (game.isPlaying)
-                    OutlinedButton(
-                      onPressed: () => _addBusiness(game, player),
-                      child: const Text('Add Business'),
-                    ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(MdiIcons.lock),
+                    onPressed: () => _editPassword(game, player, context),
+                    tooltip: 'Change Password',
+                  ),
                 ],
               ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: GestureDetector(
+              onTapDown: (_) {
+                setState(() => showCash = true);
+              },
+              onTapCancel: () {
+                setState(() => showCash = false);
+              },
+              onTapUp: (_) {
+                setState(() => showCash = false);
+              },
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  color: Colors.green.shade700,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                        const Spacer(),
+                        if (!showCash)
+                          Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                        if (showCash)
+                          Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
+                        ),
+                      ],
+                    ),
+                    if (showCash)
+                      Row(
+                        children: [
+                          Expanded(flex: 1, child: Container()),
+                          Expanded(
+                            flex: 6,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                children: game
+                                    .playerCashHistory(player)
+                                    .map((e) => Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(e.title,
+                                                style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                            const Spacer(),
+                                            Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
+                                                style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                          ],
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ),
+                          Expanded(flex: 1, child: Container()),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (true) //game.isPlaying && cash > 0)
+            _item(
+                title: 'Transfer Cash', onTap: () => _transferMoney(game, player), iconData: MdiIcons.bankTransferOut),
+          ...businesses.map((business) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    color: business.color,
+                  ),
+                  child: Row(
+                    children: [
+                      Text(business.name, style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                      const SizedBox(width: 12),
+                      Text('(${business.size}/${business.maxSize})',
+                          style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(MdiIcons.plus),
+                        onPressed: business.size >= business.maxSize || game.isComplete
+                            ? null
+                            : () => game.addShop(player, business),
+                        color: colorScheme.onPrimary,
+                      ),
+                      IconButton(
+                        icon: const Icon(MdiIcons.minus),
+                        onPressed: game.isComplete ? null : () => game.removeShop(player, business),
+                        color: colorScheme.onPrimary,
+                      ),
+                    ],
+                  ),
+                ),
+              )),
+          if (game.isPlaying)
+            OutlinedButton(
+              onPressed: () => _addBusiness(game, player),
+              child: const Text('Add Business'),
+            ),
+        ];
+        return Scaffold(
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                  pinned: true,
+                  snap: false,
+                  floating: false,
+                  expandedHeight: 160.0,
+                  backgroundColor: player.colorValue,
+                  iconTheme: IconThemeData(color: player.contrastColor),
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(player.name, style: textTheme.headline6!.copyWith(color: player.contrastColor)),
+                  ),
+                  actions: [
+                    if (!game.isStarted)
+                      IconButton(
+                        icon: const Icon(MdiIcons.delete),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          game.deletePlayer(player);
+                        },
+                      ),
+                  ]),
+              SliverPadding(
+                padding: const EdgeInsets.all(12),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((_, index) => children[index], childCount: children.length),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -396,5 +379,37 @@ class _PlayerPageState extends State<PlayerPage> {
     if (shopType != null) {
       game.addBusiness(player, shopType);
     }
+  }
+
+  /* Get a list item widget for the player's list. */
+  Widget _item({required String title, IconData? iconData, String? subtitle, VoidCallback? onTap}) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            color: Colors.blue.shade700,
+          ),
+          child: Row(
+            children: [
+              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+              const Spacer(),
+              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+              if (iconData != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Icon(iconData, color: colorScheme.onPrimary, size: 32),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

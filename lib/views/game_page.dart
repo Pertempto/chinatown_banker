@@ -93,12 +93,11 @@ class _GamePageState extends State<GamePage> {
                                     width: 32,
                                     height: 32,
                                     decoration: BoxDecoration(
-                                      color: Color(player.colorValue),
+                                      color: player.colorValue,
                                       borderRadius: const BorderRadius.all(Radius.circular(16)),
                                       border: Border.all(
                                         width: 1,
-                                        color:
-                                            Color(player.colorValue) == Colors.white ? Colors.grey : Colors.transparent,
+                                        color: player.colorValue == Colors.white ? Colors.grey : Colors.transparent,
                                       ),
                                       // color: Color(player.colorValue),
                                     ),
@@ -203,7 +202,7 @@ class _GamePageState extends State<GamePage> {
     return Chip(
       label: Text(business.toString(), style: textTheme.bodyText1),
       visualDensity: VisualDensity.compact,
-      backgroundColor: Color(player.colorValue),
+      backgroundColor: player.colorValue,
       side: const BorderSide(color: Colors.white, width: 1, style: BorderStyle.solid),
       padding: const EdgeInsets.all(0),
     );
