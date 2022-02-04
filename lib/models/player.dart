@@ -69,7 +69,7 @@ PlayerColor _randomColor() {
 
 Color _convertColor(PlayerColor color) {
   return {
-        PlayerColor.green: Colors.green,
+        PlayerColor.green: Colors.green.shade500,
         PlayerColor.purple: Colors.purple,
         PlayerColor.red: Colors.red,
         PlayerColor.white: Colors.white,

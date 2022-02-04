@@ -1,20 +1,20 @@
-import 'package:chinatown_banker/views/player_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../models/board.dart';
 import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
+import '../views/player_selector.dart';
+import 'board_view.dart';
 import 'password_input.dart';
-import 'shop_type_selector.dart';
 
 class PlayerPage extends StatefulWidget {
   final int gameKey;
   final String playerId;
 
-  const PlayerPage({Key? key, required this.gameKey, required this.playerId})
-      : super(key: key);
+  const PlayerPage({Key? key, required this.gameKey, required this.playerId}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PlayerPageState();
@@ -62,11 +62,9 @@ class _PlayerPageState extends State<PlayerPage> {
                 ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(children: children),
-            ),
+          body: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(children: children),
           ),
         );
       },
@@ -78,7 +76,6 @@ class _PlayerPageState extends State<PlayerPage> {
     int cash = game.playerCash(player);
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
-    Iterable<Business> businesses = game.playerBusinesses(player).values;
     return [
       Padding(
         padding: const EdgeInsets.only(bottom: 8),
@@ -97,22 +94,15 @@ class _PlayerPageState extends State<PlayerPage> {
               children: [
                 Row(
                   children: [
-                    Text('Cash',
-                        style: textTheme.headline4!
-                            .copyWith(color: colorScheme.onPrimary)),
+                    Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
                     const Spacer(),
                     if (!showCash)
-                      Text('Press to view',
-                          style: textTheme.bodyText1!
-                              .copyWith(color: colorScheme.onPrimary)),
+                      Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
                     if (showCash)
-                      Text('\$${cash}k',
-                          style: textTheme.headline5!
-                              .copyWith(color: colorScheme.onPrimary)),
+                      Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
                     Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Icon(MdiIcons.cash,
-                          color: colorScheme.onPrimary, size: 32),
+                      child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
                     ),
                   ],
                 ),
@@ -131,19 +121,10 @@ class _PlayerPageState extends State<PlayerPage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(e.title,
-                                            style: textTheme.bodyText1!
-                                                .copyWith(
-                                                    color:
-                                                        colorScheme.onPrimary)),
+                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
                                         const Spacer(),
-                                        Text(
-                                            e.amount < 0
-                                                ? '(\$${-e.amount}k)'
-                                                : '\$${e.amount}k',
-                                            style: textTheme.bodyText1!
-                                                .copyWith(
-                                                    color:
-                                                        colorScheme.onPrimary)),
+                                        Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
+                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
                                       ],
                                     ))
                                 .toList(),
@@ -158,56 +139,14 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
         ),
       ),
-      if (game.isPlaying && cash > 0)
-        _item(
-          title: 'Transfer Cash',
-          backgroundColor: Colors.blue.shade700,
-          iconData: MdiIcons.bankTransferOut,
-          onTap: () => _transferMoney(game, player),
+      Expanded(
+        child: BoardView(
+          game: game,
+          onPropertyTap: (propertyNumber) {
+            setState(() => game.board.setOwnerId(propertyNumber, player.id));
+          },
         ),
-      ...businesses.map((business) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                color: business.color,
-              ),
-              child: Row(
-                children: [
-                  Text(business.name,
-                      style: textTheme.headline5!
-                          .copyWith(color: colorScheme.onPrimary)),
-                  const SizedBox(width: 12),
-                  Text('(${business.size}/${business.maxSize})',
-                      style: textTheme.headline6!
-                          .copyWith(color: colorScheme.onPrimary)),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(MdiIcons.plus),
-                    onPressed:
-                        business.size >= business.maxSize || game.isComplete
-                            ? null
-                            : () => game.addShop(player, business),
-                    color: colorScheme.onPrimary,
-                  ),
-                  IconButton(
-                    icon: const Icon(MdiIcons.minus),
-                    onPressed: game.isComplete
-                        ? null
-                        : () => game.removeShop(player, business),
-                    color: colorScheme.onPrimary,
-                  ),
-                ],
-              ),
-            ),
-          )),
-      if (game.isPlaying)
-        OutlinedButton(
-          onPressed: () => _addBusiness(game, player),
-          child: const Text('Add Business'),
-        ),
+      ),
     ];
   }
 
@@ -234,14 +173,9 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
           child: Row(
             children: [
-              Text(title,
-                  style: textTheme.headline4!
-                      .copyWith(color: colorScheme.onPrimary)),
+              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
               const Spacer(),
-              if (subtitle != null)
-                Text(subtitle,
-                    style: textTheme.bodyText1!
-                        .copyWith(color: colorScheme.onPrimary)),
+              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
               if (iconData != null)
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -257,11 +191,7 @@ class _PlayerPageState extends State<PlayerPage> {
 
   /* Get an outlined list item widget for the player's list. */
   Widget _outlinedItem(
-      {required String title,
-      IconData? iconData,
-      Widget? trailing,
-      String? subtitle,
-      VoidCallback? onTap}) {
+      {required String title, IconData? iconData, Widget? trailing, String? subtitle, VoidCallback? onTap}) {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -279,10 +209,7 @@ class _PlayerPageState extends State<PlayerPage> {
               Text(title, style: textTheme.headline4),
               const Spacer(),
               if (subtitle != null) Text(subtitle, style: textTheme.bodyText1),
-              if (iconData != null)
-                Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Icon(iconData, size: 32)),
+              if (iconData != null) Padding(padding: const EdgeInsets.all(16), child: Icon(iconData, size: 32)),
               if (trailing != null) trailing,
             ],
           ),
@@ -316,9 +243,7 @@ class _PlayerPageState extends State<PlayerPage> {
             borderRadius: const BorderRadius.all(Radius.circular(20)),
             border: Border.all(
               width: 1,
-              color: player.contrastColor == Colors.black
-                  ? Colors.grey
-                  : Colors.transparent,
+              color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
             ),
           ),
           margin: const EdgeInsets.all(16),
@@ -330,8 +255,7 @@ class _PlayerPageState extends State<PlayerPage> {
 
   /* Allow the player to edit their name. */
   _editName(Game game, Player player, BuildContext context) {
-    TextEditingController textFieldController =
-        TextEditingController(text: player.name);
+    TextEditingController textFieldController = TextEditingController(text: player.name);
     showDialog(
       context: context,
       builder: (context) {
@@ -346,8 +270,7 @@ class _PlayerPageState extends State<PlayerPage> {
                 child: Text('Name:'),
               ),
               Expanded(
-                child:
-                    TextField(autofocus: true, controller: textFieldController),
+                child: TextField(autofocus: true, controller: textFieldController),
               ),
             ],
           ),
@@ -378,8 +301,7 @@ class _PlayerPageState extends State<PlayerPage> {
     if (player.password.isNotEmpty) {
       String? password = await Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => const PasswordInput(isNewPassword: false)),
+        MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
       );
       if (password == null) {
         return;
@@ -393,8 +315,7 @@ class _PlayerPageState extends State<PlayerPage> {
     }
     String? newPassword = await Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => const PasswordInput(isNewPassword: true)),
+      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: true)),
     );
     if (newPassword != null) {
       game.changePlayerPassword(player, newPassword);
@@ -410,8 +331,7 @@ class _PlayerPageState extends State<PlayerPage> {
     Player? receiver = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PlayerSelector(
-            players: game.players.values.where((p) => p.id != player.id)),
+        builder: (context) => PlayerSelector(players: game.players.values.where((p) => p.id != player.id)),
       ),
     );
     if (receiver != null) {
@@ -473,17 +393,6 @@ class _PlayerPageState extends State<PlayerPage> {
           });
         },
       );
-    }
-  }
-
-  /* Show a shop type dialog so the user can add a business */
-  _addBusiness(Game game, Player player) async {
-    ShopType? shopType = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ShopTypeSelector()),
-    );
-    if (shopType != null) {
-      game.addBusiness(player, shopType);
     }
   }
 }

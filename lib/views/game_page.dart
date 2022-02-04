@@ -29,6 +29,7 @@ class _GamePageState extends State<GamePage> {
       appBar: AppBar(
         title: const Text('Game'),
         actions: [
+          IconButton(icon: const Icon(MdiIcons.viewDashboard), onPressed: () {}),
           IconButton(icon: const Icon(MdiIcons.delete), onPressed: _delete)
         ],
       ),

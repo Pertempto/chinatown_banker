@@ -1,7 +1,8 @@
-import 'package:chinatown_banker/models/business.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
+import '../models/business.dart';
+import 'board.dart';
 import 'event.dart';
 import 'player.dart';
 
@@ -38,6 +39,9 @@ class Game extends HiveObject {
   final Map<String, int> _playerCash;
   final Map<String, List<CashRecordEntry>> _playerCashHistory;
   final Map<String, Map<String, Business>> _playerBusinesses;
+  final Board _board = Board();
+
+  Board get board => _board;
 
   bool get isStarted => _events.isNotEmpty;
 
