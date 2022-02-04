@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PasswordInput extends StatefulWidget {
   final bool isNewPassword;
 
-  const PasswordInput({Key? key, required this.isNewPassword}) : super(key: key);
+  const PasswordInput({Key? key, required this.isNewPassword})
+      : super(key: key);
 
   @override
   State<PasswordInput> createState() => _PasswordInputState();
@@ -55,7 +55,8 @@ class _PasswordInputState extends State<PasswordInput> {
             IconButton(
                 icon: const Icon(MdiIcons.check),
                 onPressed: () {
-                  Navigator.pop(context, enteredPassword.map((i) => i.toString()).join());
+                  Navigator.pop(
+                      context, enteredPassword.map((i) => i.toString()).join());
                 }),
         ],
       ),
@@ -65,7 +66,10 @@ class _PasswordInputState extends State<PasswordInput> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(height: boxSize, width: 0, margin: const EdgeInsets.symmetric(vertical: 4)),
+              Container(
+                  height: boxSize,
+                  width: 0,
+                  margin: const EdgeInsets.symmetric(vertical: 4)),
               ...enteredPassword.map((colorIndex) => Container(
                     width: boxSize,
                     height: boxSize,
@@ -76,12 +80,15 @@ class _PasswordInputState extends State<PasswordInput> {
                     ),
                     child: Center(
                         child: Text(colorIndex.toString(),
-                            style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary))),
+                            style: textTheme.headline4!
+                                .copyWith(color: colorScheme.onPrimary))),
                   )),
               const Spacer(),
               IconButton(
                 icon: const Icon(MdiIcons.backspace),
-                onPressed: enteredPassword.isEmpty ? null : () => setState(() => enteredPassword.removeLast()),
+                onPressed: enteredPassword.isEmpty
+                    ? null
+                    : () => setState(() => enteredPassword.removeLast()),
               ),
             ],
           ),
@@ -94,7 +101,9 @@ class _PasswordInputState extends State<PasswordInput> {
                 2,
                 (columnIndex) {
                   int itemIndex = (rowIndex * 2) + columnIndex;
-                  int colorIndex = itemIndex < shuffledNumbers.length ? shuffledNumbers[itemIndex] : 0;
+                  int colorIndex = itemIndex < shuffledNumbers.length
+                      ? shuffledNumbers[itemIndex]
+                      : 0;
                   return Expanded(
                     child: GestureDetector(
                       onTap: () => setState(() {
@@ -108,7 +117,8 @@ class _PasswordInputState extends State<PasswordInput> {
                         child: Center(
                           child: Text(
                             colorIndex.toString(),
-                            style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary),
+                            style: textTheme.headline4!
+                                .copyWith(color: colorScheme.onPrimary),
                           ),
                         ),
                       ),

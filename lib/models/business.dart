@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -8,7 +7,8 @@ part 'business.g.dart';
 
 String _randomKey() {
   String id = '';
-  String options = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  String options =
+      '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   Random rand = Random();
   for (int i = 0; i < 2; i++) {
     id += options[rand.nextInt(options.length)];

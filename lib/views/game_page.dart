@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -28,7 +28,9 @@ class _GamePageState extends State<GamePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game'),
-        actions: [IconButton(icon: const Icon(MdiIcons.delete), onPressed: _delete)],
+        actions: [
+          IconButton(icon: const Icon(MdiIcons.delete), onPressed: _delete)
+        ],
       ),
       body: ValueListenableBuilder<Box>(
           valueListenable: gamesBox.listenable(keys: [gameKey]),
@@ -50,7 +52,8 @@ class _GamePageState extends State<GamePage> {
                         padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(8)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
                           color: Colors.grey.shade300,
                         ),
                         child: Row(
@@ -61,10 +64,18 @@ class _GamePageState extends State<GamePage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (!game.isStarted)
-                                  TextButton(onPressed: game.canStart ? game.start : null, child: const Text('Start')),
-                                if (game.canGoBack) TextButton(onPressed: game.goBack, child: const Text('Back')),
+                                  TextButton(
+                                      onPressed:
+                                          game.canStart ? game.start : null,
+                                      child: const Text('Start')),
+                                if (game.canGoBack)
+                                  TextButton(
+                                      onPressed: game.goBack,
+                                      child: const Text('Back')),
                                 if (game.isPlaying)
-                                  TextButton(onPressed: game.completeYear, child: const Text('Next Year')),
+                                  TextButton(
+                                      onPressed: game.completeYear,
+                                      child: const Text('Next Year')),
                               ],
                             ),
                           ],
@@ -72,7 +83,8 @@ class _GamePageState extends State<GamePage> {
                       ),
                     ),
                     ...game.players.values.map((player) {
-                      Iterable<Business> businesses = game.playerBusinesses(player).values;
+                      Iterable<Business> businesses =
+                          game.playerBusinesses(player).values;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: GestureDetector(
@@ -80,7 +92,8 @@ class _GamePageState extends State<GamePage> {
                           child: Container(
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                             decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(8)),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
                               border: Border.all(width: 2, color: Colors.grey),
                             ),
                             child: Column(
@@ -89,14 +102,17 @@ class _GamePageState extends State<GamePage> {
                               children: [
                                 Row(mainAxisSize: MainAxisSize.min, children: [
                                   Container(
-                                    width: 32,
-                                    height: 32,
+                                    width: 40,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                       color: player.color,
-                                      borderRadius: const BorderRadius.all(Radius.circular(16)),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(20)),
                                       border: Border.all(
                                         width: 1,
-                                        color: player.color == Colors.white ? Colors.grey : Colors.transparent,
+                                        color: player.color == Colors.white
+                                            ? Colors.grey
+                                            : Colors.transparent,
                                       ),
                                       // color: Color(player.colorValue),
                                     ),
@@ -108,14 +124,18 @@ class _GamePageState extends State<GamePage> {
                                   // const SizedBox(width: 8),
                                   // const Icon(MdiIcons.domain),
                                 ]),
-                                if (!game.isStarted) Text('Tap to edit', style: textTheme.subtitle1),
+                                if (!game.isStarted)
+                                  Text('Tap to edit',
+                                      style: textTheme.subtitle1),
                                 if (game.isStarted && businesses.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Wrap(
                                       spacing: 4,
                                       alignment: WrapAlignment.start,
-                                      children: businesses.map((b) => _businessChip(b, player)).toList(),
+                                      children: businesses
+                                          .map((b) => _businessChip(b, player))
+                                          .toList(),
                                     ),
                                   ),
                               ],
@@ -173,12 +193,19 @@ class _GamePageState extends State<GamePage> {
   _openPlayer(Player player) async {
     if (player.password.isEmpty) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PlayerPage(gameKey: gameKey, playerId: player.id)));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  PlayerPage(gameKey: gameKey, playerId: player.id)));
       return;
+    }
+    if (kDebugMode) {
+      print('Player password ${player.password}');
     }
     String? password = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
+      MaterialPageRoute(
+          builder: (context) => const PasswordInput(isNewPassword: false)),
     );
     if (password == null) {
       return;
@@ -190,7 +217,9 @@ class _GamePageState extends State<GamePage> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => PlayerPage(gameKey: gameKey, playerId: player.id)),
+        MaterialPageRoute(
+            builder: (context) =>
+                PlayerPage(gameKey: gameKey, playerId: player.id)),
       );
     }
   }
@@ -200,8 +229,12 @@ class _GamePageState extends State<GamePage> {
     return Chip(
       label: Text(business.toString(), style: textTheme.bodyText1),
       visualDensity: VisualDensity.compact,
-      backgroundColor: player.color,
-      side: const BorderSide(color: Colors.white, width: 1, style: BorderStyle.solid),
+      backgroundColor: Colors.transparent,
+      side: const BorderSide(
+        color: Colors.grey,
+        width: 2,
+        style: BorderStyle.solid,
+      ),
       padding: const EdgeInsets.all(0),
     );
   }

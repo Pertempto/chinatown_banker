@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../models/business.dart';
 
@@ -27,16 +26,19 @@ class ShopTypeSelector extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(8)),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
                               color: shopTypeColor(shopType),
                             ),
                             child: Row(
                               children: [
                                 Text(shopTypeName(shopType),
-                                    style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                                    style: textTheme.headline4!.copyWith(
+                                        color: colorScheme.onPrimary)),
                                 const Spacer(),
                                 Text('${shopTypeMaxSize(shopType)}',
-                                    style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                                    style: textTheme.headline5!.copyWith(
+                                        color: colorScheme.onPrimary)),
                               ],
                             ),
                           ),

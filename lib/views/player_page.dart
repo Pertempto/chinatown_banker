@@ -9,25 +9,12 @@ import '../models/player.dart';
 import 'password_input.dart';
 import 'shop_type_selector.dart';
 
-const List<List<int>> board = [
-  [00, 01, 02, 00, 00, 16, 17, 18, 00, 28, 29, 30, 00, 43, 44, 45, 46],
-  [00, 03, 04, 05, 00, 19, 20, 21, 00, 31, 29, 30, 00, 43, 44, 45, 50],
-  [06, 07, 08, 09, 00, 22, 23, 00, 00, 34, 29, 30, 00, 43, 44, 45, 54],
-  [10, 11, 12, 00, 00, 24, 25, 00, 00, 00, 29, 30, 39, 00, 00, 45, 56],
-  [13, 14, 05, 00, 00, 26, 27, 00, 00, 00, 29, 30, 42, 00, 00, 45, 58],
-  [00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00],
-  [00, 00, 00, 00, 00, 00, 59, 60, 00, 00, 00, 71, 72, 73, 74, 00, 00],
-  [00, 00, 00, 00, 00, 00, 61, 62, 00, 00, 00, 75, 76, 77, 78, 00, 00],
-  [00, 00, 00, 00, 00, 00, 63, 64, 65, 00, 00, 79, 80, 81, 82, 00, 00],
-  [00, 00, 00, 00, 00, 00, 66, 67, 68, 00, 00, 83, 84, 85, 00, 00, 00],
-  [00, 00, 00, 00, 00, 00, 00, 69, 70, 00, 00, 00, 00, 00, 00, 00, 00],
-];
-
 class PlayerPage extends StatefulWidget {
   final int gameKey;
   final String playerId;
 
-  const PlayerPage({Key? key, required this.gameKey, required this.playerId}) : super(key: key);
+  const PlayerPage({Key? key, required this.gameKey, required this.playerId})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PlayerPageState();
@@ -45,8 +32,6 @@ class _PlayerPageState extends State<PlayerPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return ValueListenableBuilder<Box>(
       valueListenable: gamesBox.listenable(keys: [gameKey]),
       builder: (context, box, widget) {
@@ -60,72 +45,28 @@ class _PlayerPageState extends State<PlayerPage> {
           if (!editMode) ..._viewWidgets(game, player),
           if (editMode) ..._editWidgets(game, player),
         ];
+
         return Scaffold(
-          body: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                  pinned: true,
-                  snap: false,
-                  floating: false,
-                  expandedHeight: 360.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Text(player.name),
-                    centerTitle: true,
-                    background: Container(
-                      padding: const EdgeInsets.fromLTRB(16, 96, 16, 0),
-                      width: double.infinity,
-                      alignment: Alignment.topCenter,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: List.generate(
-                          11,
-                          (y) => Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: List.generate(
-                              17,
-                              (x) => Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(1),
-                                  child: AspectRatio(
-                                    aspectRatio: 1,
-                                    child: Container(
-                                      color: board[y][x] == 0 ? Colors.transparent : Colors.white,
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        board[y][x] == 0 ? '' : board[y][x].toString(),
-                                        style: textTheme.subtitle2,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    if (editSelected)
-                      IconButton(
-                        icon: const Icon(MdiIcons.eye),
-                        onPressed: () => setState(() => editSelected = false),
-                      ),
-                    if (!editSelected && !editLocked)
-                      IconButton(
-                        icon: const Icon(MdiIcons.pencil),
-                        onPressed: () => setState(() => editSelected = true),
-                      ),
-                  ]),
-              SliverPadding(
-                padding: const EdgeInsets.all(12),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((_, index) => children[index], childCount: children.length),
+          appBar: AppBar(
+            title: Text(player.name),
+            actions: [
+              if (editSelected)
+                IconButton(
+                  icon: const Icon(MdiIcons.eye),
+                  onPressed: () => setState(() => editSelected = false),
                 ),
-              ),
+              if (!editSelected && !editLocked)
+                IconButton(
+                  icon: const Icon(MdiIcons.pencil),
+                  onPressed: () => setState(() => editSelected = true),
+                ),
             ],
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(children: children),
+            ),
           ),
         );
       },
@@ -156,15 +97,22 @@ class _PlayerPageState extends State<PlayerPage> {
               children: [
                 Row(
                   children: [
-                    Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                    Text('Cash',
+                        style: textTheme.headline4!
+                            .copyWith(color: colorScheme.onPrimary)),
                     const Spacer(),
                     if (!showCash)
-                      Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                      Text('Press to view',
+                          style: textTheme.bodyText1!
+                              .copyWith(color: colorScheme.onPrimary)),
                     if (showCash)
-                      Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                      Text('\$${cash}k',
+                          style: textTheme.headline5!
+                              .copyWith(color: colorScheme.onPrimary)),
                     Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
+                      child: Icon(MdiIcons.cash,
+                          color: colorScheme.onPrimary, size: 32),
                     ),
                   ],
                 ),
@@ -183,10 +131,19 @@ class _PlayerPageState extends State<PlayerPage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(e.title,
-                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                            style: textTheme.bodyText1!
+                                                .copyWith(
+                                                    color:
+                                                        colorScheme.onPrimary)),
                                         const Spacer(),
-                                        Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
-                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                        Text(
+                                            e.amount < 0
+                                                ? '(\$${-e.amount}k)'
+                                                : '\$${e.amount}k',
+                                            style: textTheme.bodyText1!
+                                                .copyWith(
+                                                    color:
+                                                        colorScheme.onPrimary)),
                                       ],
                                     ))
                                 .toList(),
@@ -219,21 +176,27 @@ class _PlayerPageState extends State<PlayerPage> {
               ),
               child: Row(
                 children: [
-                  Text(business.name, style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                  Text(business.name,
+                      style: textTheme.headline5!
+                          .copyWith(color: colorScheme.onPrimary)),
                   const SizedBox(width: 12),
                   Text('(${business.size}/${business.maxSize})',
-                      style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                      style: textTheme.headline6!
+                          .copyWith(color: colorScheme.onPrimary)),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(MdiIcons.plus),
-                    onPressed: business.size >= business.maxSize || game.isComplete
-                        ? null
-                        : () => game.addShop(player, business),
+                    onPressed:
+                        business.size >= business.maxSize || game.isComplete
+                            ? null
+                            : () => game.addShop(player, business),
                     color: colorScheme.onPrimary,
                   ),
                   IconButton(
                     icon: const Icon(MdiIcons.minus),
-                    onPressed: game.isComplete ? null : () => game.removeShop(player, business),
+                    onPressed: game.isComplete
+                        ? null
+                        : () => game.removeShop(player, business),
                     color: colorScheme.onPrimary,
                   ),
                 ],
@@ -271,9 +234,14 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
           child: Row(
             children: [
-              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+              Text(title,
+                  style: textTheme.headline4!
+                      .copyWith(color: colorScheme.onPrimary)),
               const Spacer(),
-              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+              if (subtitle != null)
+                Text(subtitle,
+                    style: textTheme.bodyText1!
+                        .copyWith(color: colorScheme.onPrimary)),
               if (iconData != null)
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -289,9 +257,12 @@ class _PlayerPageState extends State<PlayerPage> {
 
   /* Get an outlined list item widget for the player's list. */
   Widget _outlinedItem(
-      {required String title, IconData? iconData, Widget? trailing, String? subtitle, VoidCallback? onTap}) {
+      {required String title,
+      IconData? iconData,
+      Widget? trailing,
+      String? subtitle,
+      VoidCallback? onTap}) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GestureDetector(
@@ -308,7 +279,10 @@ class _PlayerPageState extends State<PlayerPage> {
               Text(title, style: textTheme.headline4),
               const Spacer(),
               if (subtitle != null) Text(subtitle, style: textTheme.bodyText1),
-              if (iconData != null) Padding(padding: const EdgeInsets.all(16), child: Icon(iconData, size: 32)),
+              if (iconData != null)
+                Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Icon(iconData, size: 32)),
               if (trailing != null) trailing,
             ],
           ),
@@ -326,6 +300,12 @@ class _PlayerPageState extends State<PlayerPage> {
         onTap: () => _editName(game, player, context),
       ),
       _outlinedItem(
+        title: 'Password',
+        subtitle: 'Tap to edit',
+        iconData: MdiIcons.lock,
+        onTap: () => _editPassword(game, player, context),
+      ),
+      _outlinedItem(
         title: 'Color',
         subtitle: 'Tap to change',
         trailing: Container(
@@ -336,7 +316,9 @@ class _PlayerPageState extends State<PlayerPage> {
             borderRadius: const BorderRadius.all(Radius.circular(20)),
             border: Border.all(
               width: 1,
-              color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
+              color: player.contrastColor == Colors.black
+                  ? Colors.grey
+                  : Colors.transparent,
             ),
           ),
           margin: const EdgeInsets.all(16),
@@ -348,7 +330,8 @@ class _PlayerPageState extends State<PlayerPage> {
 
   /* Allow the player to edit their name. */
   _editName(Game game, Player player, BuildContext context) {
-    TextEditingController textFieldController = TextEditingController(text: player.name);
+    TextEditingController textFieldController =
+        TextEditingController(text: player.name);
     showDialog(
       context: context,
       builder: (context) {
@@ -363,7 +346,8 @@ class _PlayerPageState extends State<PlayerPage> {
                 child: Text('Name:'),
               ),
               Expanded(
-                child: TextField(autofocus: true, controller: textFieldController),
+                child:
+                    TextField(autofocus: true, controller: textFieldController),
               ),
             ],
           ),
@@ -394,7 +378,8 @@ class _PlayerPageState extends State<PlayerPage> {
     if (player.password.isNotEmpty) {
       String? password = await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
+        MaterialPageRoute(
+            builder: (context) => const PasswordInput(isNewPassword: false)),
       );
       if (password == null) {
         return;
@@ -408,7 +393,8 @@ class _PlayerPageState extends State<PlayerPage> {
     }
     String? newPassword = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: true)),
+      MaterialPageRoute(
+          builder: (context) => const PasswordInput(isNewPassword: true)),
     );
     if (newPassword != null) {
       game.changePlayerPassword(player, newPassword);
@@ -424,7 +410,8 @@ class _PlayerPageState extends State<PlayerPage> {
     Player? receiver = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PlayerSelector(players: game.players.values.where((p) => p.id != player.id)),
+        builder: (context) => PlayerSelector(
+            players: game.players.values.where((p) => p.id != player.id)),
       ),
     );
     if (receiver != null) {

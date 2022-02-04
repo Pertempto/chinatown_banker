@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -32,12 +31,16 @@ class _GamesPageState extends State<GamesPage> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(game.players.length.toString(), style: textTheme.subtitle1),
+                      Text(game.players.length.toString(),
+                          style: textTheme.subtitle1),
                       const SizedBox(width: 8),
                       const Icon(MdiIcons.accountGroup),
                     ],
                   ),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => GamePage(gameKey: k))),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GamePage(gameKey: k))),
                 );
               })
               .toList()
@@ -55,7 +58,8 @@ class _GamesPageState extends State<GamesPage> {
 
   _addGame() {
     gamesBox.add(Game.create()).then((gameKey) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => GamePage(gameKey: gameKey)));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => GamePage(gameKey: gameKey)));
     });
   }
 }

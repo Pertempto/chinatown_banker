@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../models/player.dart';
 
@@ -29,12 +28,15 @@ class PlayerSelector extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(8)),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
                               color: player.color,
                             ),
                             child: Row(
                               children: [
-                                Text(player.name, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                                Text(player.name,
+                                    style: textTheme.headline4!.copyWith(
+                                        color: colorScheme.onPrimary)),
                                 const Spacer(),
                               ],
                             ),
