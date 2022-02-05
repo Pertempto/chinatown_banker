@@ -30,6 +30,7 @@ class BoardView extends StatefulWidget {
 
 class _BoardViewState extends State<BoardView> {
   late Game game = widget.game;
+  int selectedPropertyNumber = 0;
   late double width;
   late double height;
   late TransformationController controller;
@@ -66,92 +67,92 @@ class _BoardViewState extends State<BoardView> {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(20)),
-          child: InteractiveViewer(
-            key: _viewerKey,
-            constrained: false,
-            maxScale: 1.5,
-            minScale: 0.5,
-            transformationController: controller,
-            child: Container(
-              width: width,
-              height: height,
-              alignment: Alignment.center,
-              // color: Colors.blue,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(
-                  11,
-                  (y) => Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: List.generate(
-                      17,
-                      (x) {
-                        int propertyNumber = propertyNumbers[y][x];
-                        bool isProperty = propertyNumber != 0;
-                        ShopType? shopType = game.board.getShop(propertyNumber);
-                        Color propertyColor = isProperty ? Colors.grey.shade400 : Colors.transparent;
-                        if (shopType != null) {
-                          propertyColor = shopTypeColor(shopType);
-                        }
-                        String? ownerId = game.board.getOwnerId(propertyNumber);
-                        return GestureDetector(
-                          onTap: () {
-                            if (isProperty && widget.onPropertyTap != null) {
-                              widget.onPropertyTap!(propertyNumber);
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(0.5),
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(6)),
-                                color: propertyColor,
-                              ),
-                              alignment: Alignment.center,
-                              child: Stack(
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      propertyNumbers[y][x] == 0 ? '' : propertyNumbers[y][x].toString(),
-                                      style: textTheme.headline6!.copyWith(color: Colors.white),
-                                    ),
+        InteractiveViewer(
+          key: _viewerKey,
+          constrained: false,
+          maxScale: 1.5,
+          minScale: 0.5,
+          transformationController: controller,
+          child: Container(
+            width: width,
+            height: height,
+            alignment: Alignment.center,
+            // color: Colors.blue,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(
+                11,
+                (y) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(
+                    17,
+                    (x) {
+                      int propertyNumber = propertyNumbers[y][x];
+                      bool isProperty = propertyNumber != 0;
+                      ShopType? shopType = game.board.getShop(propertyNumber);
+                      Color propertyColor = isProperty ? Colors.grey.shade400 : Colors.transparent;
+                      if (shopType != null) {
+                        propertyColor = shopTypeColor(shopType);
+                      }
+                      String? ownerId = game.board.getOwnerId(propertyNumber);
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedPropertyNumber = propertyNumber),
+                        child: Padding(
+                          padding: const EdgeInsets.all(0.5),
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(6)),
+                              color: propertyColor,
+                            ),
+                            alignment: Alignment.center,
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Text(
+                                    propertyNumbers[y][x] == 0 ? '' : propertyNumbers[y][x].toString(),
+                                    style: textTheme.headline6!.copyWith(color: Colors.white),
                                   ),
-                                  if (isProperty && ownerId != null)
-                                    Center(
-                                      child: Container(
-                                        height: 28,
-                                        width: 28,
-                                        decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(Radius.circular(14)),
-                                          color: game.players[ownerId]?.color ?? Colors.transparent,
-                                        ),
+                                ),
+                                if (isProperty && ownerId != null)
+                                  Center(
+                                    child: Container(
+                                      height: 28,
+                                      width: 28,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                                        color: game.players[ownerId]?.color ?? Colors.transparent,
                                       ),
                                     ),
-                                ],
-                              ),
+                                  ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
             ),
           ),
         ),
-        IgnorePointer(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-              border: Border.all(width: 2, color: Colors.grey),
+        if (selectedPropertyNumber != 0)
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: const EdgeInsets.all(12),
+              width: double.infinity,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(6)),
+                border: Border.all(color: Colors.grey, width: 2),
+                color: Colors.white,
+              ),
+              child: Text(selectedPropertyNumber.toString()),
             ),
           ),
-        ),
       ],
     );
   }

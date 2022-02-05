@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import '../models/board.dart';
-import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
-import '../views/player_selector.dart';
-import 'board_view.dart';
+import 'outlined_item.dart';
 import 'password_input.dart';
 
 class PlayerPage extends StatefulWidget {
@@ -139,100 +136,24 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
         ),
       ),
-      Expanded(
-        child: BoardView(
-          game: game,
-          onPropertyTap: (propertyNumber) {
-            setState(() => game.board.setOwnerId(propertyNumber, player.id));
-          },
-        ),
-      ),
     ];
-  }
-
-  /* Get a list item widget for the player's list. */
-  Widget _item(
-      {required String title,
-      required Color backgroundColor,
-      IconData? iconData,
-      Widget? trailing,
-      String? subtitle,
-      VoidCallback? onTap}) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
-            color: backgroundColor,
-          ),
-          child: Row(
-            children: [
-              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
-              const Spacer(),
-              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-              if (iconData != null)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Icon(iconData, color: colorScheme.onPrimary, size: 32),
-                ),
-              if (trailing != null) trailing,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /* Get an outlined list item widget for the player's list. */
-  Widget _outlinedItem(
-      {required String title, IconData? iconData, Widget? trailing, String? subtitle, VoidCallback? onTap}) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
-            border: Border.all(width: 2, color: Colors.grey),
-          ),
-          child: Row(
-            children: [
-              Text(title, style: textTheme.headline4),
-              const Spacer(),
-              if (subtitle != null) Text(subtitle, style: textTheme.bodyText1),
-              if (iconData != null) Padding(padding: const EdgeInsets.all(16), child: Icon(iconData, size: 32)),
-              if (trailing != null) trailing,
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   _editWidgets(Game game, Player player) {
     return [
-      _outlinedItem(
+      OutlinedItem(
         title: player.name,
         subtitle: 'Tap to edit',
         iconData: MdiIcons.accountCowboyHat,
         onTap: () => _editName(game, player, context),
       ),
-      _outlinedItem(
+      OutlinedItem(
         title: 'Password',
         subtitle: 'Tap to edit',
         iconData: MdiIcons.lock,
         onTap: () => _editPassword(game, player, context),
       ),
-      _outlinedItem(
+      OutlinedItem(
         title: 'Color',
         subtitle: 'Tap to change',
         trailing: Container(
@@ -323,76 +244,6 @@ class _PlayerPageState extends State<PlayerPage> {
         content: Text('Password changed successfully!'),
         duration: Duration(milliseconds: 2000),
       ));
-    }
-  }
-
-  /* Allow the user to select a player and amount to transfer */
-  _transferMoney(Game game, Player player) async {
-    Player? receiver = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PlayerSelector(players: game.players.values.where((p) => p.id != player.id)),
-      ),
-    );
-    if (receiver != null) {
-      double maxCash = game.playerCash(player).toDouble();
-      int divisions = maxCash ~/ 10;
-      showDialog(
-        context: context,
-        builder: (context) {
-          int amount = 10;
-          return StatefulBuilder(builder: (context, innerSetState) {
-            return AlertDialog(
-              title: const Text('Select Amount'),
-              contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      const Text('Amount'),
-                      const Spacer(),
-                      Text('\$${amount}k'),
-                    ],
-                  ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Slider(
-                      value: amount.toDouble(),
-                      onChanged: (value) {
-                        innerSetState(() {
-                          amount = value.toInt();
-                        });
-                      },
-                      min: 0,
-                      max: maxCash,
-                      divisions: divisions,
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Cancel'),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                TextButton(
-                  child: const Text('Transfer'),
-                  onPressed: () {
-                    if (amount == 0) {
-                      return;
-                    }
-                    game.transferCash(player, receiver, amount);
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          });
-        },
-      );
     }
   }
 }
