@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 import '../models/business.dart';
 import '../models/game.dart';
+import 'item.dart';
+import 'outlined_item.dart';
 
 const List<List<int>> propertyNumbers = [
   [00, 01, 02, 00, 00, 16, 17, 18, 00, 28, 29, 30, 00, 43, 44, 45, 46],
@@ -64,7 +67,11 @@ class _BoardViewState extends State<BoardView> {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
+    String? selectedPropertyOwnerId = game.board.getOwnerId(selectedPropertyNumber);
+    Color? selectedPropertyOwnerColor = game.players[selectedPropertyOwnerId]?.color;
+    ShopType? selectedPropertyShopType = game.board.getShopType(selectedPropertyNumber);
     return Stack(
       children: [
         InteractiveViewer(
@@ -89,14 +96,24 @@ class _BoardViewState extends State<BoardView> {
                     (x) {
                       int propertyNumber = propertyNumbers[y][x];
                       bool isProperty = propertyNumber != 0;
-                      ShopType? shopType = game.board.getShop(propertyNumber);
+                      ShopType? shopType = game.board.getShopType(propertyNumber);
                       Color propertyColor = isProperty ? Colors.grey.shade400 : Colors.transparent;
                       if (shopType != null) {
                         propertyColor = shopTypeColor(shopType);
                       }
                       String? ownerId = game.board.getOwnerId(propertyNumber);
                       return GestureDetector(
-                        onTap: () => setState(() => selectedPropertyNumber = propertyNumber),
+                        onTap: () => setState(() {
+                          if (game.isPlaying) {
+                            selectedPropertyNumber = propertyNumber;
+                            if (ownerId == null) {
+                              // shortcut: if there is no owner, select one first
+                              _setOwner();
+                            }
+                          } else {
+                            selectedPropertyNumber = 0;
+                          }
+                        }),
                         child: Padding(
                           padding: const EdgeInsets.all(0.5),
                           child: Container(
@@ -143,17 +160,146 @@ class _BoardViewState extends State<BoardView> {
             alignment: Alignment.bottomCenter,
             child: Container(
               margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               width: double.infinity,
-              height: 100,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(6)),
                 border: Border.all(color: Colors.grey, width: 2),
                 color: Colors.white,
               ),
-              child: Text(selectedPropertyNumber.toString()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(selectedPropertyNumber.toString(), style: textTheme.headline6),
+                  Row(
+                    children: [
+                      TextButton.icon(
+                        onPressed: _setOwner,
+                        icon: const Icon(MdiIcons.account),
+                        label: const Text('Set Owner'),
+                      ),
+                      const Spacer(),
+                      if (selectedPropertyOwnerColor != null)
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: selectedPropertyOwnerColor,
+                            borderRadius: const BorderRadius.all(Radius.circular(20)),
+                            border: Border.all(
+                              width: 1,
+                              color: selectedPropertyOwnerColor == Colors.white ? Colors.grey : Colors.transparent,
+                            ),
+                            // color: Color(player.colorValue),
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (selectedPropertyOwnerId != null)
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          onPressed: _setShop,
+                          icon: const Icon(MdiIcons.domain),
+                          label: const Text('Set Shop'),
+                        ),
+                        const Spacer(),
+                        if (selectedPropertyShopType != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                            decoration: BoxDecoration(
+                              color: shopTypeColor(selectedPropertyShopType),
+                              borderRadius: const BorderRadius.all(Radius.circular(6)),
+                            ),
+                            child: Text(shopTypeName(selectedPropertyShopType),
+                                style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                          )
+                      ],
+                    ),
+                ],
+              ),
             ),
           ),
       ],
+    );
+  }
+
+  _setOwner() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+            contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedItem(
+                  title: 'None',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    setState(() => game.board.setOwnerId(selectedPropertyNumber, null));
+                  },
+                ),
+                ...game.players.values.map((player) => OutlinedItem(
+                      title: player.name,
+                      leading: Container(
+                        margin: const EdgeInsets.all(12),
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: player.color,
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
+                          border: Border.all(
+                            width: 1,
+                            color: player.color == Colors.white ? Colors.grey : Colors.transparent,
+                          ),
+                          // color: Color(player.colorValue),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        setState(() => game.board.setOwnerId(selectedPropertyNumber, player.id));
+                      },
+                    ))
+              ],
+            ),
+          );
+        });
+  }
+
+  _setShop() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+          contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedItem(
+                  title: 'None',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    setState(() => game.board.setShopType(selectedPropertyNumber, null));
+                  },
+                ),
+                ...ShopType.values.map((shopType) => Item(
+                      title: shopTypeName(shopType),
+                      backgroundColor: shopTypeColor(shopType),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        setState(() => game.board.setShopType(selectedPropertyNumber, shopType));
+                      },
+                    ))
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

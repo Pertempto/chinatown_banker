@@ -3,12 +3,20 @@ import 'package:flutter/material.dart';
 class OutlinedItem extends StatelessWidget {
   final String title;
   final IconData? iconData;
+  final Widget? leading;
   final Widget? trailing;
   final String? subtitle;
   final VoidCallback? onTap;
 
-  const OutlinedItem({Key? key, required this.title, this.iconData, this.trailing, this.subtitle, this.onTap})
-      : super(key: key);
+  const OutlinedItem({
+    Key? key,
+    required this.title,
+    this.iconData,
+    this.leading,
+    this.trailing,
+    this.subtitle,
+    this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +27,7 @@ class OutlinedItem extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+          padding: EdgeInsets.only(left: leading == null ? 16 : 0),
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -27,7 +35,11 @@ class OutlinedItem extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+              if (leading != null) leading!,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(title, style: textTheme.headline4),
+              ),
               const Spacer(),
               if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
               if (iconData != null)

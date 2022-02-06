@@ -44,7 +44,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   controller: _tabController,
                   tabs: const <Widget>[
                     Tab(icon: Icon(MdiIcons.viewDashboard)),
-                    Tab(icon: Icon(MdiIcons.accountMultiple)),
+                    Tab(icon: Icon(MdiIcons.accountGroup)),
                     Tab(icon: Icon(MdiIcons.cash)),
                     Tab(icon: Icon(MdiIcons.cog)),
                   ],

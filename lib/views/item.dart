@@ -35,7 +35,10 @@ class Item extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+              ),
               const Spacer(),
               if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
               if (iconData != null)

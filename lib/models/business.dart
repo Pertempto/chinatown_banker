@@ -73,12 +73,12 @@ Color shopTypeColor(ShopType shopType) {
         ShopType.jewellery: Colors.lightBlue[500],
         ShopType.tropicalFish: Colors.indigo[900],
         ShopType.florist: Colors.blue[700],
-        ShopType.takeOut: Colors.orange[600],
+        ShopType.takeOut: Colors.orange[500],
         ShopType.laundry: Colors.brown[800],
         ShopType.dimSum: Colors.deepOrange[800],
-        ShopType.antiques: Colors.amber[700],
+        ShopType.antiques: Colors.amber[900],
         ShopType.factory: Colors.brown[500],
-        ShopType.restaurant: Colors.yellow[800],
+        ShopType.restaurant: Colors.yellow[600],
       }[shopType] ??
       Colors.black;
 }

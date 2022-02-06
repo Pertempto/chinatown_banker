@@ -8,9 +8,13 @@ class Board {
 
   final Map<int, ShopType> _propertyShops = {};
 
-  setOwnerId(int propertyNumber, String ownerId) {
+  setOwnerId(int propertyNumber, String? ownerId) {
     if (checkPropertyNumber(propertyNumber)) {
-      _propertyOwnerIds[propertyNumber] = ownerId;
+      if (ownerId == null) {
+        _propertyOwnerIds.remove(propertyNumber);
+      } else {
+        _propertyOwnerIds[propertyNumber] = ownerId;
+      }
     }
   }
 
@@ -18,13 +22,17 @@ class Board {
     return _propertyOwnerIds[propertyNumber];
   }
 
-  setShop(int propertyNumber, ShopType shopType) {
+  setShopType(int propertyNumber, ShopType? shopType) {
     if (checkPropertyNumber(propertyNumber)) {
-      _propertyShops[propertyNumber] = shopType;
+      if (shopType == null) {
+        _propertyShops.remove(propertyNumber);
+      } else {
+        _propertyShops[propertyNumber] = shopType;
+      }
     }
   }
 
-  ShopType? getShop(int propertyNumber) {
+  ShopType? getShopType(int propertyNumber) {
     return _propertyShops[propertyNumber];
   }
 
