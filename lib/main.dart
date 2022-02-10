@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -17,6 +20,9 @@ void main() async {
   Hive.registerAdapter<Business>(BusinessAdapter());
   Hive.registerAdapter<ShopType>(ShopTypeAdapter());
   await Hive.openBox<Game>('games');
+  if (Platform.isWindows) {
+    await DesktopWindow.setMinWindowSize(const Size(800, 1000));
+  }
   runApp(const MyApp());
 }
 
@@ -26,6 +32,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Chinatown Banker', theme: ThemeData(primarySwatch: Colors.red), home: const GamesPage());
+    return MaterialApp(
+        title: 'Chinatown Banker',
+        theme: ThemeData(primarySwatch: Colors.red),
+        home: const GamesPage());
   }
 }
