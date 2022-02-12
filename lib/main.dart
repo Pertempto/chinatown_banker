@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../views/games_page.dart';
@@ -34,7 +35,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Chinatown Banker',
-        theme: ThemeData(primarySwatch: Colors.red),
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          textTheme: GoogleFonts.latoTextTheme(
+            Theme.of(context).textTheme,
+          ),
+        ),
+        debugShowCheckedModeBanner: false,
         home: const GamesPage());
   }
 }

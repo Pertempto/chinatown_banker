@@ -22,8 +22,8 @@ class Item extends StatelessWidget {
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
@@ -37,10 +37,15 @@ class Item extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Text(title, style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                child: Text(title,
+                    style: textTheme.headline4!
+                        .copyWith(color: colorScheme.onPrimary)),
               ),
               const Spacer(),
-              if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+              if (subtitle != null)
+                Text(subtitle!,
+                    style: textTheme.bodyText1!
+                        .copyWith(color: colorScheme.onPrimary)),
               if (iconData != null)
                 Padding(
                   padding: const EdgeInsets.all(16),

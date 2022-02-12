@@ -25,7 +25,8 @@ class BoardView extends StatefulWidget {
   final Game game;
   final Function(int)? onPropertyTap;
 
-  const BoardView({Key? key, required this.game, this.onPropertyTap}) : super(key: key);
+  const BoardView({Key? key, required this.game, this.onPropertyTap})
+      : super(key: key);
 
   @override
   _BoardViewState createState() => _BoardViewState();
@@ -54,7 +55,8 @@ class _BoardViewState extends State<BoardView> {
       });
     });
 
-    controller = TransformationController(Matrix4(0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1));
+    controller = TransformationController(
+        Matrix4(0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 1));
   }
 
   @override
@@ -69,9 +71,12 @@ class _BoardViewState extends State<BoardView> {
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
-    String? selectedPropertyOwnerId = game.board.getOwnerId(selectedPropertyNumber);
-    Color? selectedPropertyOwnerColor = game.players[selectedPropertyOwnerId]?.color;
-    ShopType? selectedPropertyShopType = game.board.getShopType(selectedPropertyNumber);
+    String? selectedPropertyOwnerId =
+        game.board.getOwnerId(selectedPropertyNumber);
+    Color? selectedPropertyOwnerColor =
+        game.players[selectedPropertyOwnerId]?.color;
+    ShopType? selectedPropertyShopType =
+        game.board.getShopType(selectedPropertyNumber);
     return Stack(
       children: [
         InteractiveViewer(
@@ -96,20 +101,21 @@ class _BoardViewState extends State<BoardView> {
                     (x) {
                       int propertyNumber = propertyNumbers[y][x];
                       bool isProperty = propertyNumber != 0;
-                      ShopType? shopType = game.board.getShopType(propertyNumber);
-                      Color propertyColor = isProperty ? Colors.grey.shade400 : Colors.transparent;
+                      bool isSelected = isProperty &&
+                          propertyNumber == selectedPropertyNumber;
+                      ShopType? shopType =
+                          game.board.getShopType(propertyNumber);
+                      Color propertyColor = isProperty
+                          ? Colors.grey.shade400
+                          : Colors.transparent;
                       if (shopType != null) {
                         propertyColor = shopTypeColor(shopType);
                       }
                       String? ownerId = game.board.getOwnerId(propertyNumber);
                       return GestureDetector(
                         onTap: () => setState(() {
-                          if (game.isPlaying) {
+                          if (game.isPlaying && isProperty) {
                             selectedPropertyNumber = propertyNumber;
-                            if (ownerId == null) {
-                              // shortcut: if there is no owner, select one first
-                              _setOwner();
-                            }
                           } else {
                             selectedPropertyNumber = 0;
                           }
@@ -120,7 +126,11 @@ class _BoardViewState extends State<BoardView> {
                             height: 40,
                             width: 40,
                             decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(6)),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(6)),
+                              border: isSelected
+                                  ? Border.all(color: Colors.black, width: 1)
+                                  : null,
                               color: propertyColor,
                             ),
                             alignment: Alignment.center,
@@ -128,8 +138,11 @@ class _BoardViewState extends State<BoardView> {
                               children: [
                                 Center(
                                   child: Text(
-                                    propertyNumbers[y][x] == 0 ? '' : propertyNumbers[y][x].toString(),
-                                    style: textTheme.headline6!.copyWith(color: Colors.white),
+                                    propertyNumbers[y][x] == 0
+                                        ? ''
+                                        : propertyNumbers[y][x].toString(),
+                                    style: textTheme.headline6!
+                                        .copyWith(color: Colors.white),
                                   ),
                                 ),
                                 if (isProperty && ownerId != null)
@@ -138,8 +151,22 @@ class _BoardViewState extends State<BoardView> {
                                       height: 28,
                                       width: 28,
                                       decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(Radius.circular(14)),
-                                        color: game.players[ownerId]?.color ?? Colors.transparent,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(14)),
+                                        color: game.players[ownerId]?.color ??
+                                            Colors.transparent,
+                                        border: Border.all(
+                                            color: Colors.grey, width: 0),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          propertyNumbers[y][x] == 0
+                                              ? ''
+                                              : propertyNumbers[y][x]
+                                                  .toString(),
+                                          style: textTheme.subtitle1!
+                                              .copyWith(color: Colors.black),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -162,61 +189,29 @@ class _BoardViewState extends State<BoardView> {
               margin: const EdgeInsets.all(12),
               padding: const EdgeInsets.all(12),
               width: double.infinity,
+              height: 100,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(6)),
                 border: Border.all(color: Colors.grey, width: 2),
                 color: Colors.white,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(selectedPropertyNumber.toString(), style: textTheme.headline6),
-                  Row(
-                    children: [
-                      TextButton.icon(
-                        onPressed: _setOwner,
-                        icon: const Icon(MdiIcons.account),
-                        label: const Text('Set Owner'),
-                      ),
-                      const Spacer(),
-                      if (selectedPropertyOwnerColor != null)
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: selectedPropertyOwnerColor,
-                            borderRadius: const BorderRadius.all(Radius.circular(20)),
-                            border: Border.all(
-                              width: 1,
-                              color: selectedPropertyOwnerColor == Colors.white ? Colors.grey : Colors.transparent,
-                            ),
-                            // color: Color(player.colorValue),
-                          ),
-                        ),
-                    ],
-                  ),
-                  if (selectedPropertyOwnerId != null)
-                    Row(
-                      children: [
-                        TextButton.icon(
-                          onPressed: _setShop,
-                          icon: const Icon(MdiIcons.domain),
-                          label: const Text('Set Shop'),
-                        ),
-                        const Spacer(),
-                        if (selectedPropertyShopType != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-                            decoration: BoxDecoration(
-                              color: shopTypeColor(selectedPropertyShopType),
-                              borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            ),
-                            child: Text(shopTypeName(selectedPropertyShopType),
-                                style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-                          )
-                      ],
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: _setOwner,
+                      icon: const Icon(MdiIcons.account),
+                      label: const Text('Set Owner'),
                     ),
+                  ),
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: _setShop,
+                      icon: const Icon(MdiIcons.domain),
+                      label: const Text('Set Shop'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -230,7 +225,8 @@ class _BoardViewState extends State<BoardView> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16))),
             contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -239,7 +235,8 @@ class _BoardViewState extends State<BoardView> {
                   title: 'None',
                   onTap: () {
                     Navigator.of(context).pop();
-                    setState(() => game.board.setOwnerId(selectedPropertyNumber, null));
+                    setState(() =>
+                        game.board.setOwnerId(selectedPropertyNumber, null));
                   },
                 ),
                 ...game.players.values.map((player) => OutlinedItem(
@@ -250,17 +247,21 @@ class _BoardViewState extends State<BoardView> {
                         height: 40,
                         decoration: BoxDecoration(
                           color: player.color,
-                          borderRadius: const BorderRadius.all(Radius.circular(20)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
                           border: Border.all(
                             width: 1,
-                            color: player.color == Colors.white ? Colors.grey : Colors.transparent,
+                            color: player.color == Colors.white
+                                ? Colors.grey
+                                : Colors.transparent,
                           ),
                           // color: Color(player.colorValue),
                         ),
                       ),
                       onTap: () {
                         Navigator.of(context).pop();
-                        setState(() => game.board.setOwnerId(selectedPropertyNumber, player.id));
+                        setState(() => game.board
+                            .setOwnerId(selectedPropertyNumber, player.id));
                       },
                     ))
               ],
@@ -274,7 +275,8 @@ class _BoardViewState extends State<BoardView> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16))),
           contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
           content: SingleChildScrollView(
             child: Column(
@@ -284,7 +286,8 @@ class _BoardViewState extends State<BoardView> {
                   title: 'None',
                   onTap: () {
                     Navigator.of(context).pop();
-                    setState(() => game.board.setShopType(selectedPropertyNumber, null));
+                    setState(() =>
+                        game.board.setShopType(selectedPropertyNumber, null));
                   },
                 ),
                 ...ShopType.values.map((shopType) => Item(
@@ -292,7 +295,8 @@ class _BoardViewState extends State<BoardView> {
                       backgroundColor: shopTypeColor(shopType),
                       onTap: () {
                         Navigator.of(context).pop();
-                        setState(() => game.board.setShopType(selectedPropertyNumber, shopType));
+                        setState(() => game.board
+                            .setShopType(selectedPropertyNumber, shopType));
                       },
                     ))
               ],

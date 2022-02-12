@@ -41,11 +41,11 @@ class OutlinedItem extends StatelessWidget {
                 child: Text(title, style: textTheme.headline4),
               ),
               const Spacer(),
-              if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+              if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1),
               if (iconData != null)
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Icon(iconData, color: colorScheme.onPrimary, size: 32),
+                  child: Icon(iconData, size: 32),
                 ),
               if (trailing != null) trailing!,
             ],

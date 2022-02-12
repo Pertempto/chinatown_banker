@@ -76,9 +76,9 @@ Color shopTypeColor(ShopType shopType) {
         ShopType.takeOut: Colors.orange[500],
         ShopType.laundry: Colors.brown[800],
         ShopType.dimSum: Colors.deepOrange[800],
-        ShopType.antiques: Colors.amber[900],
+        ShopType.antiques: const Color(0xFF84754A),
         ShopType.factory: Colors.brown[500],
-        ShopType.restaurant: Colors.yellow[600],
+        ShopType.restaurant: const Color(0xFF785D0B),
       }[shopType] ??
       Colors.black;
 }
