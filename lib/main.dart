@@ -40,6 +40,13 @@ class MyApp extends StatelessWidget {
           textTheme: GoogleFonts.latoTextTheme(
             Theme.of(context).textTheme,
           ),
+          cardTheme: CardTheme(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(width: 1, color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
         ),
         debugShowCheckedModeBanner: false,
         home: const GamesPage());

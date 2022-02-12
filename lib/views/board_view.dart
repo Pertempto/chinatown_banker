@@ -5,7 +5,6 @@ import 'package:vector_math/vector_math_64.dart' as vector;
 import '../models/business.dart';
 import '../models/game.dart';
 import 'item.dart';
-import 'outlined_item.dart';
 
 const List<List<int>> propertyNumbers = [
   [00, 01, 02, 00, 00, 16, 17, 18, 00, 28, 29, 30, 00, 43, 44, 45, 46],
@@ -82,100 +81,106 @@ class _BoardViewState extends State<BoardView> {
         InteractiveViewer(
           key: _viewerKey,
           constrained: false,
-          maxScale: 1.5,
+          maxScale: 10,
           minScale: 0.5,
           transformationController: controller,
           child: Container(
             width: width,
             height: height,
             alignment: Alignment.center,
-            // color: Colors.blue,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                11,
-                (y) => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    17,
-                    (x) {
-                      int propertyNumber = propertyNumbers[y][x];
-                      bool isProperty = propertyNumber != 0;
-                      bool isSelected = isProperty &&
-                          propertyNumber == selectedPropertyNumber;
-                      ShopType? shopType =
-                          game.board.getShopType(propertyNumber);
-                      Color propertyColor = isProperty
-                          ? Colors.grey.shade400
-                          : Colors.transparent;
-                      if (shopType != null) {
-                        propertyColor = shopTypeColor(shopType);
-                      }
-                      String? ownerId = game.board.getOwnerId(propertyNumber);
-                      return GestureDetector(
-                        onTap: () => setState(() {
-                          if (game.isPlaying && isProperty) {
-                            selectedPropertyNumber = propertyNumber;
-                          } else {
-                            selectedPropertyNumber = 0;
-                          }
-                        }),
-                        child: Padding(
-                          padding: const EdgeInsets.all(0.5),
-                          child: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(6)),
-                              border: isSelected
-                                  ? Border.all(color: Colors.black, width: 1)
-                                  : null,
-                              color: propertyColor,
-                            ),
-                            alignment: Alignment.center,
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Text(
-                                    propertyNumbers[y][x] == 0
-                                        ? ''
-                                        : propertyNumbers[y][x].toString(),
-                                    style: textTheme.headline6!
-                                        .copyWith(color: Colors.white),
-                                  ),
-                                ),
-                                if (isProperty && ownerId != null)
+            child: Container(
+              padding: const EdgeInsets.all(50),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(50)),
+                color: Colors.grey.shade200,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                  11,
+                  (y) => Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      17,
+                      (x) {
+                        int propertyNumber = propertyNumbers[y][x];
+                        bool isProperty = propertyNumber != 0;
+                        bool isSelected = isProperty &&
+                            propertyNumber == selectedPropertyNumber;
+                        ShopType? shopType =
+                            game.board.getShopType(propertyNumber);
+                        Color propertyColor = isProperty
+                            ? Colors.grey.shade400
+                            : Colors.transparent;
+                        if (shopType != null) {
+                          propertyColor = shopTypeColor(shopType);
+                        }
+                        String? ownerId = game.board.getOwnerId(propertyNumber);
+                        return GestureDetector(
+                          onTap: () => setState(() {
+                            if (game.isPlaying && isProperty) {
+                              selectedPropertyNumber = propertyNumber;
+                            } else {
+                              selectedPropertyNumber = 0;
+                            }
+                          }),
+                          child: Padding(
+                            padding: const EdgeInsets.all(0.5),
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(6)),
+                                border: isSelected
+                                    ? Border.all(color: Colors.black, width: 1)
+                                    : null,
+                                color: propertyColor,
+                              ),
+                              alignment: Alignment.center,
+                              child: Stack(
+                                children: [
                                   Center(
-                                    child: Container(
-                                      height: 28,
-                                      width: 28,
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(14)),
-                                        color: game.players[ownerId]?.color ??
-                                            Colors.transparent,
-                                        border: Border.all(
-                                            color: Colors.grey, width: 0),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          propertyNumbers[y][x] == 0
-                                              ? ''
-                                              : propertyNumbers[y][x]
-                                                  .toString(),
-                                          style: textTheme.subtitle1!
-                                              .copyWith(color: Colors.black),
+                                    child: Text(
+                                      propertyNumbers[y][x] == 0
+                                          ? ''
+                                          : propertyNumbers[y][x].toString(),
+                                      style: textTheme.headline6!
+                                          .copyWith(color: Colors.white),
+                                    ),
+                                  ),
+                                  if (isProperty && ownerId != null)
+                                    Center(
+                                      child: Container(
+                                        height: 28,
+                                        width: 28,
+                                        decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(14)),
+                                          color: game.players[ownerId]?.color ??
+                                              Colors.transparent,
+                                          border: Border.all(
+                                              color: Colors.grey, width: 0),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            propertyNumbers[y][x] == 0
+                                                ? ''
+                                                : propertyNumbers[y][x]
+                                                    .toString(),
+                                            style: textTheme.subtitle1!
+                                                .copyWith(color: Colors.black),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -207,7 +212,8 @@ class _BoardViewState extends State<BoardView> {
                   ),
                   Expanded(
                     child: TextButton.icon(
-                      onPressed: _setShop,
+                      onPressed:
+                          selectedPropertyOwnerId == null ? null : _setShop,
                       icon: const Icon(MdiIcons.domain),
                       label: const Text('Set Shop'),
                     ),
@@ -231,7 +237,7 @@ class _BoardViewState extends State<BoardView> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                OutlinedItem(
+                Item(
                   title: 'None',
                   onTap: () {
                     Navigator.of(context).pop();
@@ -239,7 +245,7 @@ class _BoardViewState extends State<BoardView> {
                         game.board.setOwnerId(selectedPropertyNumber, null));
                   },
                 ),
-                ...game.players.values.map((player) => OutlinedItem(
+                ...game.players.values.map((player) => Item(
                       title: player.name,
                       leading: Container(
                         margin: const EdgeInsets.all(12),
@@ -282,7 +288,7 @@ class _BoardViewState extends State<BoardView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                OutlinedItem(
+                Item(
                   title: 'None',
                   onTap: () {
                     Navigator.of(context).pop();
@@ -293,6 +299,7 @@ class _BoardViewState extends State<BoardView> {
                 ...ShopType.values.map((shopType) => Item(
                       title: shopTypeName(shopType),
                       backgroundColor: shopTypeColor(shopType),
+                      outlined: false,
                       onTap: () {
                         Navigator.of(context).pop();
                         setState(() => game.board

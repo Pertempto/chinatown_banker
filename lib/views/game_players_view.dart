@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
-import 'outlined_item.dart';
+import 'item.dart';
 import 'password_input.dart';
 import 'player_page.dart';
 
@@ -47,9 +47,17 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (!game.isStarted)
-                          TextButton(onPressed: game.canStart ? game.start : null, child: const Text('Start')),
-                        if (game.canGoBack) TextButton(onPressed: game.goBack, child: const Text('Back')),
-                        if (game.isPlaying) TextButton(onPressed: game.completeYear, child: const Text('Next Year')),
+                          TextButton(
+                              onPressed: game.canStart ? game.start : null,
+                              child: const Text('Start')),
+                        if (game.canGoBack)
+                          TextButton(
+                              onPressed: game.goBack,
+                              child: const Text('Back')),
+                        if (game.isPlaying)
+                          TextButton(
+                              onPressed: game.completeYear,
+                              child: const Text('Next Year')),
                       ],
                     ),
                   ],
@@ -57,8 +65,7 @@ class _GamePlayersViewState extends State<GamePlayersView> {
               ),
             ),
             ...game.players.values.map((player) {
-              Iterable<Business> businesses = game.playerBusinesses(player).values;
-              return OutlinedItem(
+              return Item(
                 title: player.name,
                 leading: Container(
                   margin: const EdgeInsets.all(12),
@@ -69,62 +76,14 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                     border: Border.all(
                       width: 1,
-                      color: player.color == Colors.white ? Colors.grey : Colors.transparent,
+                      color: player.color == Colors.white
+                          ? Colors.grey
+                          : Colors.transparent,
                     ),
                     // color: Color(player.colorValue),
                   ),
                 ),
                 onTap: () => _openPlayer(player),
-              );
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: GestureDetector(
-                  onTap: () => _openPlayer(player),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      border: Border.all(width: 2, color: Colors.grey),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(mainAxisSize: MainAxisSize.min, children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: player.color,
-                              borderRadius: const BorderRadius.all(Radius.circular(20)),
-                              border: Border.all(
-                                width: 1,
-                                color: player.color == Colors.white ? Colors.grey : Colors.transparent,
-                              ),
-                              // color: Color(player.colorValue),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Text(player.name, style: textTheme.headline4),
-                          const Spacer(),
-                          // Text(businesses.length.toString(), style: textTheme.headline5),
-                          // const SizedBox(width: 8),
-                          // const Icon(MdiIcons.domain),
-                        ]),
-                        if (!game.isStarted) Text('Tap to edit', style: textTheme.subtitle1),
-                        if (game.isStarted && businesses.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Wrap(
-                              spacing: 4,
-                              alignment: WrapAlignment.start,
-                              children: businesses.map((b) => _businessChip(b, player)).toList(),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
               );
             }),
             if (game.canAddPlayer)
@@ -145,7 +104,10 @@ class _GamePlayersViewState extends State<GamePlayersView> {
   _openPlayer(Player player) async {
     if (player.password.isEmpty) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PlayerPage(gameKey: game.key, playerId: player.id)));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  PlayerPage(gameKey: game.key, playerId: player.id)));
       return;
     }
     if (kDebugMode) {
@@ -153,7 +115,8 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     }
     String? password = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
+      MaterialPageRoute(
+          builder: (context) => const PasswordInput(isNewPassword: false)),
     );
     if (password == null) {
       return;
@@ -165,7 +128,9 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => PlayerPage(gameKey: game.key, playerId: player.id)),
+        MaterialPageRoute(
+            builder: (context) =>
+                PlayerPage(gameKey: game.key, playerId: player.id)),
       );
     }
   }

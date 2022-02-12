@@ -4,14 +4,15 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 import '../models/game.dart';
 import '../models/player.dart';
-import 'outlined_item.dart';
+import 'item.dart';
 import 'password_input.dart';
 
 class PlayerPage extends StatefulWidget {
   final int gameKey;
   final String playerId;
 
-  const PlayerPage({Key? key, required this.gameKey, required this.playerId}) : super(key: key);
+  const PlayerPage({Key? key, required this.gameKey, required this.playerId})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PlayerPageState();
@@ -91,15 +92,22 @@ class _PlayerPageState extends State<PlayerPage> {
               children: [
                 Row(
                   children: [
-                    Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
+                    Text('Cash',
+                        style: textTheme.headline4!
+                            .copyWith(color: colorScheme.onPrimary)),
                     const Spacer(),
                     if (!showCash)
-                      Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                      Text('Press to view',
+                          style: textTheme.bodyText1!
+                              .copyWith(color: colorScheme.onPrimary)),
                     if (showCash)
-                      Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                      Text('\$${cash}k',
+                          style: textTheme.headline5!
+                              .copyWith(color: colorScheme.onPrimary)),
                     Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
+                      child: Icon(MdiIcons.cash,
+                          color: colorScheme.onPrimary, size: 32),
                     ),
                   ],
                 ),
@@ -118,10 +126,19 @@ class _PlayerPageState extends State<PlayerPage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(e.title,
-                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                            style: textTheme.bodyText1!
+                                                .copyWith(
+                                                    color:
+                                                        colorScheme.onPrimary)),
                                         const Spacer(),
-                                        Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
-                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                                        Text(
+                                            e.amount < 0
+                                                ? '(\$${-e.amount}k)'
+                                                : '\$${e.amount}k',
+                                            style: textTheme.bodyText1!
+                                                .copyWith(
+                                                    color:
+                                                        colorScheme.onPrimary)),
                                       ],
                                     ))
                                 .toList(),
@@ -141,19 +158,19 @@ class _PlayerPageState extends State<PlayerPage> {
 
   _editWidgets(Game game, Player player) {
     return [
-      OutlinedItem(
+      Item(
         title: player.name,
         subtitle: 'Tap to edit',
         iconData: MdiIcons.accountCowboyHat,
         onTap: () => _editName(game, player, context),
       ),
-      OutlinedItem(
+      Item(
         title: 'Password',
         subtitle: 'Tap to edit',
         iconData: MdiIcons.lock,
         onTap: () => _editPassword(game, player, context),
       ),
-      OutlinedItem(
+      Item(
         title: 'Color',
         subtitle: 'Tap to change',
         trailing: Container(
@@ -164,7 +181,9 @@ class _PlayerPageState extends State<PlayerPage> {
             borderRadius: const BorderRadius.all(Radius.circular(20)),
             border: Border.all(
               width: 1,
-              color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
+              color: player.contrastColor == Colors.black
+                  ? Colors.grey
+                  : Colors.transparent,
             ),
           ),
           margin: const EdgeInsets.all(16),
@@ -176,7 +195,8 @@ class _PlayerPageState extends State<PlayerPage> {
 
   /* Allow the player to edit their name. */
   _editName(Game game, Player player, BuildContext context) {
-    TextEditingController textFieldController = TextEditingController(text: player.name);
+    TextEditingController textFieldController =
+        TextEditingController(text: player.name);
     showDialog(
       context: context,
       builder: (context) {
@@ -191,7 +211,8 @@ class _PlayerPageState extends State<PlayerPage> {
                 child: Text('Name:'),
               ),
               Expanded(
-                child: TextField(autofocus: true, controller: textFieldController),
+                child:
+                    TextField(autofocus: true, controller: textFieldController),
               ),
             ],
           ),
@@ -222,7 +243,8 @@ class _PlayerPageState extends State<PlayerPage> {
     if (player.password.isNotEmpty) {
       String? password = await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
+        MaterialPageRoute(
+            builder: (context) => const PasswordInput(isNewPassword: false)),
       );
       if (password == null) {
         return;
@@ -236,7 +258,8 @@ class _PlayerPageState extends State<PlayerPage> {
     }
     String? newPassword = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: true)),
+      MaterialPageRoute(
+          builder: (context) => const PasswordInput(isNewPassword: true)),
     );
     if (newPassword != null) {
       game.changePlayerPassword(player, newPassword);

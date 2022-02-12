@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../models/game.dart';
 import 'game_page.dart';
@@ -17,31 +16,16 @@ class _GamesPageState extends State<GamesPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(title: const Text('Games')),
       body: ValueListenableBuilder<Box>(
         valueListenable: gamesBox.listenable(),
         builder: (context, box, widget) => ListView(
+          padding: const EdgeInsets.all(12),
           children: box.keys
               .map<Widget>((k) {
                 Game game = box.get(k);
-                return ListTile(
-                  title: Text(game.dateString, style: textTheme.headline5),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(game.players.length.toString(),
-                          style: textTheme.subtitle1),
-                      const SizedBox(width: 8),
-                      const Icon(MdiIcons.accountGroup),
-                    ],
-                  ),
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GamePage(gameKey: k))),
-                );
+                return _gameWidget(game);
               })
               .toList()
               .reversed
@@ -53,6 +37,54 @@ class _GamesPageState extends State<GamesPage> {
         tooltip: 'New Game',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _gameWidget(Game game) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    return GestureDetector(
+      onTap: () => Navigator.push(context,
+          MaterialPageRoute(builder: (context) => GamePage(gameKey: game.key))),
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(game.dateString, style: textTheme.headline6),
+              SizedBox(height: 8),
+              Wrap(
+                  spacing: 16,
+                  children: game.players.values.map((player) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.all(4),
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: player.color,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20)),
+                            border: Border.all(
+                              width: 1,
+                              color: player.color == Colors.white
+                                  ? Colors.grey
+                                  : Colors.transparent,
+                            ),
+                            // color: Color(player.colorValue),
+                          ),
+                        ),
+                        Text(player.name, style: textTheme.headline6)
+                      ],
+                    );
+                  }).toList()),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
