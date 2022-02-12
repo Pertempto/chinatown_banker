@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
 import 'item.dart';
@@ -133,20 +132,5 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                 PlayerPage(gameKey: game.key, playerId: player.id)),
       );
     }
-  }
-
-  Widget _businessChip(Business business, Player player) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    return Chip(
-      label: Text(business.toString(), style: textTheme.bodyText1),
-      visualDensity: VisualDensity.compact,
-      backgroundColor: Colors.transparent,
-      side: const BorderSide(
-        color: Colors.grey,
-        width: 2,
-        style: BorderStyle.solid,
-      ),
-      padding: const EdgeInsets.all(0),
-    );
   }
 }

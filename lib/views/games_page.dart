@@ -53,7 +53,7 @@ class _GamesPageState extends State<GamesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(game.dateString, style: textTheme.headline6),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Wrap(
                   spacing: 16,
                   children: game.players.values.map((player) {

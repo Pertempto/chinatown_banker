@@ -68,14 +68,7 @@ class _BoardViewState extends State<BoardView> {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
-    String? selectedPropertyOwnerId =
-        game.board.getOwnerId(selectedPropertyNumber);
-    Color? selectedPropertyOwnerColor =
-        game.players[selectedPropertyOwnerId]?.color;
-    ShopType? selectedPropertyShopType =
-        game.board.getShopType(selectedPropertyNumber);
     return Stack(
       children: [
         InteractiveViewer(
@@ -203,26 +196,35 @@ class _BoardViewState extends State<BoardView> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Expanded(child: _setOwnerButton()),
                   Expanded(
-                    child: TextButton.icon(
-                      onPressed: _setOwner,
-                      icon: const Icon(MdiIcons.account),
-                      label: const Text('Set Owner'),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton.icon(
-                      onPressed:
-                          selectedPropertyOwnerId == null ? null : _setShop,
-                      icon: const Icon(MdiIcons.domain),
-                      label: const Text('Set Shop'),
-                    ),
+                    child: _setShopButton(
+                        disabled:
+                            game.board.getOwnerId(selectedPropertyNumber) ==
+                                null),
                   ),
                 ],
               ),
             ),
           ),
       ],
+    );
+  }
+
+  _setOwnerButton() {
+    String? ownerId = game.board.getOwnerId(selectedPropertyNumber);
+    return TextButton(
+      onPressed: _setOwner,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(MdiIcons.account),
+          const SizedBox(width: 8),
+          ownerId != null
+              ? Text(game.players[ownerId]?.name ?? '')
+              : const Text('Set Owner'),
+        ],
+      ),
     );
   }
 
@@ -274,6 +276,24 @@ class _BoardViewState extends State<BoardView> {
             ),
           );
         });
+  }
+
+  _setShopButton({bool disabled = false}) {
+    ShopType? shopType = game.board.getShopType(selectedPropertyNumber);
+
+    return TextButton(
+      onPressed: disabled ? null : _setShop,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(MdiIcons.domain),
+          const SizedBox(width: 8),
+          shopType != null
+              ? Text(shopTypeName(shopType))
+              : const Text('Set Shop'),
+        ],
+      ),
+    );
   }
 
   _setShop() {

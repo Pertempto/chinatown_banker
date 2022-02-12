@@ -27,7 +27,6 @@ class Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.only(bottom: small ? 2 : 8),
       child: GestureDetector(
@@ -48,7 +47,11 @@ class Item extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: small ? 1 : 4),
                 child: Text(title,
-                    style: small ? textTheme.headline6 : textTheme.headline4),
+                    style: (small ? textTheme.headline6 : textTheme.headline4)!
+                        .copyWith(
+                            color: backgroundColor.computeLuminance() > 0.5
+                                ? Colors.black
+                                : Colors.white)),
               ),
               const Spacer(),
               if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1),
