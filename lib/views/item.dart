@@ -58,7 +58,11 @@ class Item extends StatelessWidget {
               if (iconData != null)
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Icon(iconData, size: 32),
+                  child: Icon(iconData,
+                      size: 32,
+                      color: backgroundColor.computeLuminance() > 0.5
+                          ? Colors.black
+                          : Colors.white),
                 ),
               if (trailing != null) trailing!,
             ],
