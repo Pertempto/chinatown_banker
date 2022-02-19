@@ -70,16 +70,13 @@ class _PlayerPageState extends State<PlayerPage> {
 
   /* Get the widgets for the view mode. */
   List<Widget> _viewWidgets(Game game, Player player) {
-    int cash = game.playerCash(player);
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return [
       Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: GestureDetector(
-          onTapDown: (_) => setState(() => showCash = true),
-          onTapCancel: () => setState(() => showCash = false),
-          onTapUp: (_) => setState(() => showCash = false),
+          onTap: () => _showCash(game, player),
           child: Container(
             padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
             width: double.infinity,
@@ -93,44 +90,13 @@ class _PlayerPageState extends State<PlayerPage> {
                   children: [
                     Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
                     const Spacer(),
-                    if (!showCash)
-                      Text('Press to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                    if (showCash)
-                      Text('\$${cash}k', style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
+                    Text('Tap to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
                     ),
                   ],
                 ),
-                if (showCash)
-                  Row(
-                    children: [
-                      Expanded(flex: 1, child: Container()),
-                      Expanded(
-                        flex: 6,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Column(
-                            children: game
-                                .playerCashHistory(player)
-                                .map((e) => Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(e.title,
-                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                                        const Spacer(),
-                                        Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
-                                            style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                                      ],
-                                    ))
-                                .toList(),
-                          ),
-                        ),
-                      ),
-                      Expanded(flex: 1, child: Container()),
-                    ],
-                  ),
               ],
             ),
           ),
@@ -147,6 +113,43 @@ class _PlayerPageState extends State<PlayerPage> {
             ),
           ))
     ];
+  }
+
+  _showCash(Game game, Player player) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    int cash = game.playerCash(player);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.green.shade700,
+            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('\$${cash}k', style: textTheme.headline2!.copyWith(color: colorScheme.onPrimary)),
+                const SizedBox(height: 16),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: game
+                      .playerCashHistory(player)
+                      .map((e) => Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(e.title, style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                              const Spacer(),
+                              Text(e.amount < 0 ? '(\$${-e.amount}k)' : '\$${e.amount}k',
+                                  style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+                            ],
+                          ))
+                      .toList(),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   _editWidgets(Game game, Player player) {

@@ -133,7 +133,6 @@ class _GamePlayersViewState extends State<GamePlayersView> {
   /* A small widget representing a business. */
   Widget _businessWidget(Business business, Player player) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Container(
       child: Text(business.toString(),
           style: textTheme.bodyText1!.copyWith(

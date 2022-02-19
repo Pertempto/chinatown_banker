@@ -69,7 +69,7 @@ class _BoardViewState extends State<BoardView> {
         if (!game.isStarted)
           Center(
               child: Text(
-            'Game not started',
+            'Game Not Started',
             style: textTheme.headline2,
             textAlign: TextAlign.center,
           ))
