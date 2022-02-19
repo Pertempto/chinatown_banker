@@ -43,8 +43,8 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 bottom: TabBar(
                   controller: _tabController,
                   tabs: const <Widget>[
-                    Tab(icon: Icon(MdiIcons.viewDashboard)),
                     Tab(icon: Icon(MdiIcons.accountGroup)),
+                    Tab(icon: Icon(MdiIcons.viewDashboard)),
                     Tab(icon: Icon(MdiIcons.cash)),
                     Tab(icon: Icon(MdiIcons.cog)),
                   ],
@@ -54,8 +54,8 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _tabController,
                 children: [
-                  BoardView(game: game),
                   GamePlayersView(game: game),
+                  BoardView(game: game),
                   GameTransfersView(game: game),
                   GameSettingsView(game: game),
                 ],

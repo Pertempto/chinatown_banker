@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../views/games_page.dart';
+import 'models/board.dart';
 import 'models/business.dart';
 import 'models/event.dart';
 import 'models/game.dart';
@@ -20,8 +21,10 @@ void main() async {
   Hive.registerAdapter<PlayerColor>(PlayerColorAdapter());
   Hive.registerAdapter<Business>(BusinessAdapter());
   Hive.registerAdapter<ShopType>(ShopTypeAdapter());
+  Hive.registerAdapter<Board>(BoardAdapter());
+  // await Hive.deleteBoxFromDisk('games');
   await Hive.openBox<Game>('games');
-  if (Platform.isWindows) {
+  if (Platform.isWindows || Platform.isMacOS) {
     await DesktopWindow.setMinWindowSize(const Size(800, 1000));
   }
   runApp(const MyApp());

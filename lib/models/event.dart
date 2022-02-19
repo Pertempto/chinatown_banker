@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-import 'business.dart';
+import 'board.dart';
 
 part 'event.g.dart';
 
@@ -13,7 +13,7 @@ class Event extends HiveObject {
   DateTime dateTime;
 
   @HiveField(2)
-  Map<String, Map<String, Business>>? playerBusinesses;
+  Board? board;
 
   @HiveField(3)
   String? senderId;
@@ -27,7 +27,7 @@ class Event extends HiveObject {
   Event({
     required this.type,
     required this.dateTime,
-    this.playerBusinesses,
+    this.board,
     this.senderId,
     this.receiverId,
     this.amount,
@@ -41,7 +41,7 @@ enum EventType {
   @HiveField(1)
   transferCash,
   @HiveField(2)
-  updateBusinesses,
+  updateBoard,
   @HiveField(3)
   endOfYear,
 }

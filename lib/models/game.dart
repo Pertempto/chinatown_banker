@@ -59,9 +59,9 @@ class Game extends HiveObject {
 
   bool get canGoBack => isStarted && [EventType.startGame, EventType.endOfYear].contains(_events.last.type);
 
-  Event? get lastBusinessEvent {
-    Iterable<Event> businessEvents = _events.where((e) => e.type == EventType.updateBusinesses);
-    return businessEvents.isEmpty ? null : businessEvents.last;
+  Event? get lastBoardEvent {
+    Iterable<Event> boardEvents = _events.where((e) => e.type == EventType.updateBoard);
+    return boardEvents.isEmpty ? null : boardEvents.last;
   }
 
   String get statusText {
@@ -112,8 +112,7 @@ class Game extends HiveObject {
   completeYear() {
     if (isStarted) {
       _addEvent(Event(type: EventType.endOfYear, dateTime: DateTime.now()));
-      var pb = Map.fromEntries(_players.values.map((player) => MapEntry(player.id, playerBusinesses(player))));
-      _addEvent(Event(type: EventType.updateBusinesses, dateTime: DateTime.now(), playerBusinesses: pb));
+      _addEvent(Event(type: EventType.updateBoard, dateTime: DateTime.now(), board: board.copy()));
     }
   }
 
@@ -178,50 +177,11 @@ class Game extends HiveObject {
     }
   }
 
-  // Add a business.
-  addBusiness(Player player, ShopType shopType) {
+  // Save the updated board.
+  saveBoard() {
     if (isPlaying) {
-      Event? event = lastBusinessEvent;
-      if (event == null) {
-        event = Event(type: EventType.updateBusinesses, dateTime: DateTime.now(), playerBusinesses: {});
-        _addEvent(event);
-      }
-      event.playerBusinesses!.putIfAbsent(player.id, () => {});
-      Business business = Business.create(shopType);
-      event.playerBusinesses![player.id]![business.id] = business;
-      save();
-      _processEvents();
-    }
-  }
-
-  // Add a shop.
-  addShop(Player player, Business business) {
-    Event? event = lastBusinessEvent;
-    if (event == null) {
-      event = Event(type: EventType.updateBusinesses, dateTime: DateTime.now(), playerBusinesses: {});
+      Event event = Event(type: EventType.updateBoard, dateTime: DateTime.now(), board: _board.copy());
       _addEvent(event);
-    }
-    event.playerBusinesses!.putIfAbsent(player.id, () => {});
-    event.playerBusinesses![player.id]!.putIfAbsent(business.id, () => business);
-    event.playerBusinesses![player.id]![business.id] = Business(business.id, business.shopType, business.size + 1);
-    save();
-    _processEvents();
-  }
-
-  // Remove a shop.
-  removeShop(Player player, Business business) {
-    Event? event = lastBusinessEvent;
-    if (event != null) {
-      event.playerBusinesses!.putIfAbsent(player.id, () => {});
-      event.playerBusinesses![player.id]!.putIfAbsent(business.id, () => business);
-      Business newBusiness = Business(business.id, business.shopType, business.size - 1);
-      if (newBusiness.size <= 0) {
-        event.playerBusinesses![player.id]!.remove(business.id);
-      } else {
-        event.playerBusinesses![player.id]![business.id] = newBusiness;
-      }
-      save();
-      _processEvents();
     }
   }
 
@@ -252,10 +212,8 @@ class Game extends HiveObject {
       _playerCashHistory[sender.id]!.add(CashRecordEntry('Transfer to ${receiver.name}', -amount));
       _playerCash[receiver.id] = _playerCash[receiver.id]! + amount;
       _playerCashHistory[receiver.id]!.add(CashRecordEntry('Transfer from ${sender.name}', amount));
-    } else if (event.type == EventType.updateBusinesses) {
-      for (String playerId in event.playerBusinesses!.keys) {
-        _playerBusinesses[playerId] = Map.from(event.playerBusinesses![playerId]!);
-      }
+    } else if (event.type == EventType.updateBoard) {
+      _board.set(event.board!);
     } else if (event.type == EventType.endOfYear) {
       for (Player player in _players.values) {
         int income = 0;

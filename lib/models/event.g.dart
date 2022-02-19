@@ -19,8 +19,7 @@ class EventAdapter extends TypeAdapter<Event> {
     return Event(
       type: fields[0] as EventType,
       dateTime: fields[1] as DateTime,
-      playerBusinesses: (fields[2] as Map?)?.map((dynamic k, dynamic v) =>
-          MapEntry(k as String, (v as Map).cast<String, Business>())),
+      board: fields[2] as Board?,
       senderId: fields[3] as String?,
       receiverId: fields[4] as String?,
       amount: fields[5] as int?,
@@ -36,7 +35,7 @@ class EventAdapter extends TypeAdapter<Event> {
       ..writeByte(1)
       ..write(obj.dateTime)
       ..writeByte(2)
-      ..write(obj.playerBusinesses)
+      ..write(obj.board)
       ..writeByte(3)
       ..write(obj.senderId)
       ..writeByte(4)
@@ -68,7 +67,7 @@ class EventTypeAdapter extends TypeAdapter<EventType> {
       case 1:
         return EventType.transferCash;
       case 2:
-        return EventType.updateBusinesses;
+        return EventType.updateBoard;
       case 3:
         return EventType.endOfYear;
       default:
@@ -85,7 +84,7 @@ class EventTypeAdapter extends TypeAdapter<EventType> {
       case EventType.transferCash:
         writer.writeByte(1);
         break;
-      case EventType.updateBusinesses:
+      case EventType.updateBoard:
         writer.writeByte(2);
         break;
       case EventType.endOfYear:
