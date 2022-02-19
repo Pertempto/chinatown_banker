@@ -25,7 +25,6 @@ class _GameSettingsViewState extends State<GameSettingsView> {
         child: Column(children: [
           Item(
             title: 'Delete Game',
-            outlined: false,
             backgroundColor: Colors.red,
             iconData: MdiIcons.delete,
             onTap: () => _delete(widget.game),

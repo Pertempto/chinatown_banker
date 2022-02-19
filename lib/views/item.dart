@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class Item extends StatelessWidget {
   final String title;
   final Color backgroundColor;
-  final bool outlined;
   final IconData? iconData;
   final Widget? leading;
   final Widget? trailing;
@@ -16,7 +15,6 @@ class Item extends StatelessWidget {
     Key? key,
     required this.title,
     this.backgroundColor = Colors.white,
-    this.outlined = true,
     this.small = false,
     this.iconData,
     this.leading,
@@ -36,9 +34,8 @@ class Item extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.only(left: leading == null ? 16 : 0),
           width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
-            border: outlined ? Border.all(width: small ? 1 : 2, color: Colors.grey) : null,
+          decoration: ShapeDecoration(
+            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
             color: backgroundColor,
           ),
           child: Column(
@@ -49,9 +46,12 @@ class Item extends StatelessWidget {
                   if (leading != null) leading!,
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: small ? 1 : 4),
-                    child: Text(title,
-                        style: (small ? textTheme.headline6 : textTheme.headline4)!
-                            .copyWith(color: backgroundColor.computeLuminance() > 0.5 ? Colors.black : Colors.white)),
+                    child: Text(
+                      title,
+                      style: (small ? textTheme.headline6 : textTheme.headline4)!.copyWith(
+                        color: backgroundColor.computeLuminance() > 0.5 ? Colors.grey.shade800 : Colors.white,
+                      ),
+                    ),
                   ),
                   const Spacer(),
                   if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1),

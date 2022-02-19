@@ -50,15 +50,18 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   ],
                 ),
               ),
-              body: TabBarView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _tabController,
-                children: [
-                  GamePlayersView(game: game),
-                  BoardView(game: game),
-                  GameTransfersView(game: game),
-                  GameSettingsView(game: game),
-                ],
+              body: Container(
+                color: Colors.grey.shade300,
+                child: TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _tabController,
+                  children: [
+                    GamePlayersView(game: game),
+                    BoardView(game: game),
+                    GameTransfersView(game: game),
+                    GameSettingsView(game: game),
+                  ],
+                ),
               ));
         });
   }

@@ -23,7 +23,6 @@ class _PlayerPageState extends State<PlayerPage> {
   final Box<Game> gamesBox = Hive.box('games');
   bool editSelected = false;
   bool editLocked = false;
-  bool showCash = false;
 
   bool get editMode => editSelected || editLocked;
 
@@ -59,7 +58,8 @@ class _PlayerPageState extends State<PlayerPage> {
                 ),
             ],
           ),
-          body: Padding(
+          body: Container(
+            color: Colors.grey.shade300,
             padding: const EdgeInsets.all(12),
             child: Column(children: children),
           ),
@@ -73,39 +73,23 @@ class _PlayerPageState extends State<PlayerPage> {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return [
-      Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: GestureDetector(
-          onTap: () => _showCash(game, player),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              color: Colors.green.shade700,
+      Item(
+        title: 'Cash',
+        backgroundColor: Colors.green.shade700,
+        trailing: Row(
+          children: [
+            Text('Tap to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
             ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text('Cash', style: textTheme.headline4!.copyWith(color: colorScheme.onPrimary)),
-                    const Spacer(),
-                    Text('Tap to view', style: textTheme.bodyText1!.copyWith(color: colorScheme.onPrimary)),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          ],
         ),
+        onTap: () => _showCash(game, player),
       ),
       ...game.board.businesses(playerId).map((business) => Item(
             title: business.name,
             backgroundColor: business.color,
-            outlined: false,
             trailing: Padding(
               padding: const EdgeInsets.all(16),
               child: Text('(${business.size}/${business.maxSize})',

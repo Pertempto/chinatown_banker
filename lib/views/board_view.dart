@@ -83,13 +83,12 @@ class _BoardViewState extends State<BoardView> {
             child: Container(
               width: width,
               height: height,
-              color: Colors.white,
               alignment: Alignment.center,
               child: Container(
                 padding: EdgeInsets.all(cellSize),
                 decoration: ShapeDecoration(
                   shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(cellSize * 2))),
-                  color: Colors.grey.shade300,
+                  color: Colors.white,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -177,22 +176,23 @@ class _BoardViewState extends State<BoardView> {
             alignment: Alignment.bottomCenter,
             child: Container(
               margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(12),
               width: double.infinity,
               height: 100,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(6)),
-                border: Border.all(color: Colors.grey, width: 2),
-                color: Colors.white,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: _setOwnerButton()),
-                  Expanded(
-                    child: _setShopButton(disabled: game.board.getOwnerId(selectedPropertyNumber) == null),
+              child: Material(
+                elevation: 16,
+                shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(40))),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: _setOwnerButton()),
+                      Expanded(
+                        child: _setShopButton(disabled: game.board.getOwnerId(selectedPropertyNumber) == null),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -220,8 +220,9 @@ class _BoardViewState extends State<BoardView> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-            contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+            backgroundColor: Colors.grey.shade300,
+            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+            contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -286,8 +287,9 @@ class _BoardViewState extends State<BoardView> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-          contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+          backgroundColor: Colors.grey.shade300,
+          shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+          contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -305,7 +307,6 @@ class _BoardViewState extends State<BoardView> {
                 ...ShopType.values.map((shopType) => Item(
                       title: shopTypeName(shopType),
                       backgroundColor: shopTypeColor(shopType),
-                      outlined: false,
                       onTap: () {
                         Navigator.of(context).pop();
                         setState(() {

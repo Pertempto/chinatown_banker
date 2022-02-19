@@ -30,28 +30,17 @@ class _GamePlayersViewState extends State<GamePlayersView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  color: Colors.grey.shade300,
-                ),
+            Item(
+              title: game.statusText,
+              trailing: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(game.statusText, style: textTheme.headline4),
-                    const Spacer(),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (!game.isStarted)
-                          TextButton(onPressed: game.canStart ? game.start : null, child: const Text('Start')),
-                        if (game.canGoBack) TextButton(onPressed: game.goBack, child: const Text('Back')),
-                        if (game.isPlaying) TextButton(onPressed: game.completeYear, child: const Text('Next Year')),
-                      ],
-                    ),
+                    if (!game.isStarted)
+                      TextButton(onPressed: game.canStart ? game.start : null, child: const Text('Start')),
+                    if (game.canGoBack) TextButton(onPressed: game.goBack, child: const Text('Back')),
+                    if (game.isPlaying) TextButton(onPressed: game.completeYear, child: const Text('Next Year')),
                   ],
                 ),
               ),
