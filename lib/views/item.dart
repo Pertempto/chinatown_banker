@@ -8,6 +8,7 @@ class Item extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final String? subtitle;
+  final Widget? content;
   final VoidCallback? onTap;
   final bool small;
 
@@ -21,6 +22,7 @@ class Item extends StatelessWidget {
     this.leading,
     this.trailing,
     this.subtitle,
+    this.content,
     this.onTap,
   }) : super(key: key);
 
@@ -36,35 +38,33 @@ class Item extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(8)),
-            border: outlined
-                ? Border.all(width: small ? 1 : 2, color: Colors.grey)
-                : null,
+            border: outlined ? Border.all(width: small ? 1 : 2, color: Colors.grey) : null,
             color: backgroundColor,
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (leading != null) leading!,
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: small ? 1 : 4),
-                child: Text(title,
-                    style: (small ? textTheme.headline6 : textTheme.headline4)!
-                        .copyWith(
-                            color: backgroundColor.computeLuminance() > 0.5
-                                ? Colors.black
-                                : Colors.white)),
+              Row(
+                children: [
+                  if (leading != null) leading!,
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: small ? 1 : 4),
+                    child: Text(title,
+                        style: (small ? textTheme.headline6 : textTheme.headline4)!
+                            .copyWith(color: backgroundColor.computeLuminance() > 0.5 ? Colors.black : Colors.white)),
+                  ),
+                  const Spacer(),
+                  if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1),
+                  if (iconData != null)
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Icon(iconData,
+                          size: 32, color: backgroundColor.computeLuminance() > 0.5 ? Colors.black : Colors.white),
+                    ),
+                  if (trailing != null) trailing!,
+                ],
               ),
-              const Spacer(),
-              if (subtitle != null) Text(subtitle!, style: textTheme.bodyText1),
-              if (iconData != null)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Icon(iconData,
-                      size: 32,
-                      color: backgroundColor.computeLuminance() > 0.5
-                          ? Colors.black
-                          : Colors.white),
-                ),
-              if (trailing != null) trailing!,
+              if (content != null) content!
             ],
           ),
         ),

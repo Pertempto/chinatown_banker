@@ -146,26 +146,6 @@ class _PlayerPageState extends State<PlayerPage> {
                   style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
             ),
           ))
-      // ...game.board.businesses(playerId).map((business) => Padding(
-      //       padding: const EdgeInsets.only(bottom: 8),
-      //       child: Container(
-      //         padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-      //         width: double.infinity,
-      //         decoration: BoxDecoration(
-      //           borderRadius: const BorderRadius.all(Radius.circular(8)),
-      //           color: business.color,
-      //         ),
-      //         child: Row(
-      //           children: [
-      //             Text(business.name, style: textTheme.headline5!.copyWith(color: colorScheme.onPrimary)),
-      //             const SizedBox(width: 12),
-      //             Text('(${business.size}/${business.maxSize})',
-      //                 style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-      //             const Spacer(),
-      //           ],
-      //         ),
-      //       ),
-      //     )),
     ];
   }
 

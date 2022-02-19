@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
 import 'item.dart';
@@ -46,17 +47,9 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (!game.isStarted)
-                          TextButton(
-                              onPressed: game.canStart ? game.start : null,
-                              child: const Text('Start')),
-                        if (game.canGoBack)
-                          TextButton(
-                              onPressed: game.goBack,
-                              child: const Text('Back')),
-                        if (game.isPlaying)
-                          TextButton(
-                              onPressed: game.completeYear,
-                              child: const Text('Next Year')),
+                          TextButton(onPressed: game.canStart ? game.start : null, child: const Text('Start')),
+                        if (game.canGoBack) TextButton(onPressed: game.goBack, child: const Text('Back')),
+                        if (game.isPlaying) TextButton(onPressed: game.completeYear, child: const Text('Next Year')),
                       ],
                     ),
                   ],
@@ -64,6 +57,7 @@ class _GamePlayersViewState extends State<GamePlayersView> {
               ),
             ),
             ...game.players.values.map((player) {
+              List<Business> businesses = game.board.businesses(player.id);
               return Item(
                 title: player.name,
                 leading: Container(
@@ -75,14 +69,22 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                     border: Border.all(
                       width: 1,
-                      color: player.tokenColor == Colors.white
-                          ? Colors.grey
-                          : Colors.transparent,
+                      color: player.tokenColor == Colors.white ? Colors.grey : Colors.transparent,
                     ),
                     // color: Color(player.colorValue),
                   ),
                 ),
                 onTap: () => _openPlayer(player),
+                content: (game.isStarted && businesses.isNotEmpty)
+                    ? Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: businesses.map((b) => _businessWidget(b, player)).toList(),
+                        ),
+                      )
+                    : null,
               );
             }),
             if (game.canAddPlayer)
@@ -103,10 +105,7 @@ class _GamePlayersViewState extends State<GamePlayersView> {
   _openPlayer(Player player) async {
     if (player.password.isEmpty) {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  PlayerPage(gameKey: game.key, playerId: player.id)));
+          context, MaterialPageRoute(builder: (context) => PlayerPage(gameKey: game.key, playerId: player.id)));
       return;
     }
     if (kDebugMode) {
@@ -114,8 +113,7 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     }
     String? password = await Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => const PasswordInput(isNewPassword: false)),
+      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
     );
     if (password == null) {
       return;
@@ -127,10 +125,25 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) =>
-                PlayerPage(gameKey: game.key, playerId: player.id)),
+        MaterialPageRoute(builder: (context) => PlayerPage(gameKey: game.key, playerId: player.id)),
       );
     }
+  }
+
+  /* A small widget representing a business. */
+  Widget _businessWidget(Business business, Player player) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      child: Text(business.toString(),
+          style: textTheme.bodyText1!.copyWith(
+            color: business.color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+          )),
+      padding: const EdgeInsets.all(8),
+      decoration: ShapeDecoration(
+        shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        color: business.color,
+      ),
+    );
   }
 }
