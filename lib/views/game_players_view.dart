@@ -71,11 +71,11 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: player.color,
+                    color: player.tokenColor,
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                     border: Border.all(
                       width: 1,
-                      color: player.color == Colors.white
+                      color: player.tokenColor == Colors.white
                           ? Colors.grey
                           : Colors.transparent,
                     ),

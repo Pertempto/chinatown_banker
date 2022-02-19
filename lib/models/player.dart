@@ -7,8 +7,7 @@ part 'player.g.dart';
 
 String _randomKey() {
   String id = '';
-  String options =
-      '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  String options = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   Random rand = Random();
   for (int i = 0; i < 2; i++) {
     id += options[rand.nextInt(options.length)];
@@ -27,24 +26,19 @@ class Player extends HiveObject {
   @HiveField(2)
   String password;
 
-  @HiveField(4, defaultValue: PlayerColor.green)
-  PlayerColor _color;
+  @HiveField(3, defaultValue: PlayerColor.green)
+  PlayerColor color;
 
-  Color get color => _convertColor(_color);
+  Color get tokenColor => _convertColor(color);
 
-  Color get contrastColor => _contrastColor(_color);
+  Color get contrastColor => _contrastColor(color);
 
-  Player({required this.name, required this.password})
-      : id = _randomKey(),
-        _color = _randomColor();
+  Player({required this.name, required this.password, required this.color})
+      : id = _randomKey();
 
-  // Change the player's color to a different random color.
+  // Change the player's color to the next color.
   changeColor() {
-    PlayerColor newColorName = _color;
-    while (newColorName == _color) {
-      newColorName = _randomColor();
-    }
-    _color = newColorName;
+    color = PlayerColor.values[(PlayerColor.values.indexOf(color) + 1) % PlayerColor.values.length];
   }
 }
 
@@ -60,11 +54,6 @@ enum PlayerColor {
   white,
   @HiveField(4)
   yellow,
-}
-
-PlayerColor _randomColor() {
-  Random rand = Random();
-  return PlayerColor.values[rand.nextInt(PlayerColor.values.length)];
 }
 
 Color _convertColor(PlayerColor color) {

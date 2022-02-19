@@ -35,9 +35,8 @@ class Business {
 
   int get value => businessValue(shopType, size);
 
-  Business.create(this.shopType)
-      : id = _randomKey(),
-        size = 1;
+  Business.create(this.shopType, this.size)
+      : id = _randomKey();
 
   Business(this.id, this.shopType, this.size);
 

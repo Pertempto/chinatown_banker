@@ -32,6 +32,11 @@ class Event extends HiveObject {
     this.receiverId,
     this.amount,
   });
+
+  @override
+  String toString() {
+    return 'Event, type: $type, date: $dateTime';
+  }
 }
 
 @HiveType(typeId: 4)

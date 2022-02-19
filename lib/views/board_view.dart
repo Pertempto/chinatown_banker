@@ -2,23 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
+import '../models/board.dart';
 import '../models/business.dart';
 import '../models/game.dart';
 import 'item.dart';
-
-const List<List<int>> propertyNumbers = [
-  [00, 01, 02, 00, 00, 16, 17, 18, 00, 28, 29, 30, 00, 43, 44, 45, 46],
-  [00, 03, 04, 05, 00, 19, 20, 21, 00, 31, 32, 33, 00, 47, 48, 49, 50],
-  [06, 07, 08, 09, 00, 22, 23, 00, 00, 34, 35, 36, 00, 51, 52, 53, 54],
-  [10, 11, 12, 00, 00, 24, 25, 00, 00, 00, 37, 38, 39, 00, 00, 55, 56],
-  [13, 14, 15, 00, 00, 26, 27, 00, 00, 00, 40, 41, 42, 00, 00, 57, 58],
-  [00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00],
-  [00, 00, 00, 00, 00, 00, 59, 60, 00, 00, 00, 71, 72, 73, 74, 00, 00],
-  [00, 00, 00, 00, 00, 00, 61, 62, 00, 00, 00, 75, 76, 77, 78, 00, 00],
-  [00, 00, 00, 00, 00, 00, 63, 64, 65, 00, 00, 79, 80, 81, 82, 00, 00],
-  [00, 00, 00, 00, 00, 00, 66, 67, 68, 00, 00, 83, 84, 85, 00, 00, 00],
-  [00, 00, 00, 00, 00, 00, 00, 69, 70, 00, 00, 00, 00, 00, 00, 00, 00],
-];
 
 class BoardView extends StatefulWidget {
   final Game game;
@@ -113,7 +100,7 @@ class _BoardViewState extends State<BoardView> {
                       children: List.generate(
                         17,
                         (x) {
-                          int propertyNumber = propertyNumbers[y][x];
+                          int propertyNumber = getPropertyNumber(x, y);
                           bool isProperty = propertyNumber != 0;
                           bool isSelected = isProperty && propertyNumber == selectedPropertyNumber;
                           ShopType? shopType = game.board.getShopType(propertyNumber);
@@ -129,7 +116,7 @@ class _BoardViewState extends State<BoardView> {
                           if (isSelected) {
                             circleBorder = Border.all(color: Colors.black, width: cellSize * 0.03);
                           }
-                          Color ownershipColor = game.players[ownerId]?.color ?? Colors.transparent;
+                          Color ownershipColor = game.players[ownerId]?.tokenColor ?? Colors.transparent;
                           Color textColor = ownershipColor.computeLuminance() > 0.5 ? Colors.black : Colors.white;
                           return GestureDetector(
                             onTap: () => setState(() {
@@ -164,7 +151,7 @@ class _BoardViewState extends State<BoardView> {
                                           ),
                                           child: Center(
                                             child: Text(
-                                              propertyNumbers[y][x] == 0 ? '' : propertyNumbers[y][x].toString(),
+                                              propertyNumber == 0 ? '' : propertyNumber.toString(),
                                               style: textTheme.headline6!
                                                   .copyWith(fontSize: cellSize * 0.4, color: textColor),
                                               textAlign: TextAlign.center,
@@ -255,11 +242,11 @@ class _BoardViewState extends State<BoardView> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: player.color,
+                          color: player.tokenColor,
                           borderRadius: const BorderRadius.all(Radius.circular(20)),
                           border: Border.all(
                             width: 1,
-                            color: player.color == Colors.white ? Colors.grey : Colors.transparent,
+                            color: player.tokenColor == Colors.white ? Colors.grey : Colors.transparent,
                           ),
                           // color: Color(player.colorValue),
                         ),

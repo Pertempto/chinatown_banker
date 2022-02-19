@@ -1,8 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
-import '../models/business.dart';
 import 'board.dart';
+import 'business.dart';
 import 'event.dart';
 import 'player.dart';
 
@@ -38,8 +38,7 @@ class Game extends HiveObject {
 
   final Map<String, int> _playerCash;
   final Map<String, List<CashRecordEntry>> _playerCashHistory;
-  final Map<String, Map<String, Business>> _playerBusinesses;
-  final Board _board = Board();
+  final Board _board = Board(propertyOwnerIds: {}, propertyShops: {});
 
   Board get board => _board;
 
@@ -79,22 +78,20 @@ class Game extends HiveObject {
         _players = {},
         _events = [],
         _playerCash = {},
-        _playerCashHistory = {},
-        _playerBusinesses = {} {
+        _playerCashHistory = {} {
     _processEvents();
   }
 
   Game(this._date, this._players, this._events)
       : _playerCash = {},
-        _playerCashHistory = {},
-        _playerBusinesses = {} {
+        _playerCashHistory = {} {
     _processEvents();
   }
 
   // Add a player.
   addPlayer(String name, String password) {
     if (canAddPlayer) {
-      Player player = Player(name: name, password: password);
+      Player player = Player(name: name, password: password, color: PlayerColor.values[_players.length]);
       _players[player.id] = player;
       save();
       _processEvents();
@@ -130,9 +127,6 @@ class Game extends HiveObject {
 
   // Get a player's cash history.
   List<CashRecordEntry> playerCashHistory(Player player) => List.from(_playerCashHistory[player.id] ?? []);
-
-  // Get the businesses owned by a player.
-  Map<String, Business> playerBusinesses(Player player) => Map.from(_playerBusinesses[player.id] ?? {});
 
   // Change the player's name.
   changePlayerName(Player player, String name) {
@@ -199,7 +193,6 @@ class Game extends HiveObject {
       _playerCash[player.id] = 50;
       _playerCashHistory[player.id] = [CashRecordEntry('Initial Cash', 50)];
     }
-    _playerBusinesses.clear();
     _events.forEach(_processEvent);
   }
 
@@ -217,7 +210,7 @@ class Game extends HiveObject {
     } else if (event.type == EventType.endOfYear) {
       for (Player player in _players.values) {
         int income = 0;
-        for (Business business in playerBusinesses(player).values) {
+        for (Business business in board.businesses(player.id)) {
           income += business.value;
         }
         _playerCash[player.id] = _playerCash[player.id]! + income;
