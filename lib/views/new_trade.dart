@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -28,6 +30,9 @@ class _NewTradeState extends State<NewTrade> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Trade'),
+        actions: [
+          if (_items.isNotEmpty) IconButton(onPressed: () {}, icon: const Icon(MdiIcons.check)),
+        ],
       ),
       backgroundColor: Colors.grey.shade300,
       body: SingleChildScrollView(
@@ -114,46 +119,76 @@ class _NewTradeState extends State<NewTrade> {
                           ),
                         ],
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        child: Wrap(
-                          spacing: 8,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                              decoration: ShapeDecoration(
-                                shape: const ContinuousRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(24)),
-                                ),
-                                color: Colors.green.shade700,
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                            decoration: ShapeDecoration(
+                              shape: const ContinuousRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(24)),
                               ),
+                              color: Colors.green.shade700,
+                            ),
+                            child: GestureDetector(
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
                                   const SizedBox(width: 8),
-                                  Text('\$50k', style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                                  Text('\$${item.cash}k',
+                                      style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
                                 ],
                               ),
+                              onTap: () {
+                                // TODO: change cash amount.
+                              },
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                              decoration: ShapeDecoration(
-                                shape: const ContinuousRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(24)),
+                          ),
+                          ...item.propertyNumbers.map((propertyNumber) => Container(
+                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                decoration: ShapeDecoration(
+                                  shape: const ContinuousRectangleBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(24)),
+                                  ),
+                                  color: Colors.blue.shade700,
                                 ),
-                                color: Colors.blue.shade700,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(MdiIcons.store, color: colorScheme.onPrimary, size: 32),
-                                  const SizedBox(width: 8),
-                                  Text('#84', style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-                                ],
-                              ),
+                                child: GestureDetector(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(MdiIcons.store, color: colorScheme.onPrimary, size: 32),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '#$propertyNumber',
+                                        style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () => setState(() => item.propertyNumbers.remove(propertyNumber)),
+                                ),
+                              )),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () => setState(() {
+                                // TODO: show dialog to select property number
+                                Random rand = Random();
+                                item.propertyNumbers.add(rand.nextInt(85) + 1);
+                              }),
+                              icon: const Icon(MdiIcons.storePlus),
+                            ),
+                            IconButton(
+                              onPressed: () => setState(() => _items.remove(item)),
+                              icon: const Icon(MdiIcons.close),
                             ),
                           ],
                         ),
