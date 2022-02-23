@@ -24,7 +24,7 @@ void main() async {
   Hive.registerAdapter<ShopType>(ShopTypeAdapter());
   Hive.registerAdapter<Trade>(TradeAdapter());
   Hive.registerAdapter<TradeItem>(TradeItemAdapter());
-  // await Hive.deleteBoxFromDisk('games');
+  await Hive.deleteBoxFromDisk('games');
   await Hive.openBox<Game>('games');
   if (Platform.isWindows || Platform.isMacOS) {
     await DesktopWindow.setMinWindowSize(const Size(800, 1000));
@@ -52,6 +52,12 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+            shape: const ContinuousRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+          )),
         ),
         debugShowCheckedModeBanner: false,
         home: const GamesPage());
