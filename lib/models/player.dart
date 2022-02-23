@@ -15,7 +15,7 @@ String _randomKey() {
   return id;
 }
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 4)
 class Player extends HiveObject {
   @HiveField(0)
   String id;
@@ -42,7 +42,7 @@ class Player extends HiveObject {
   }
 }
 
-@HiveType(typeId: 7)
+@HiveType(typeId: 5)
 enum PlayerColor {
   @HiveField(0)
   green,

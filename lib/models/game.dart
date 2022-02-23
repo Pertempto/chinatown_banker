@@ -157,20 +157,6 @@ class Game extends HiveObject {
     }
   }
 
-  // Transfer money.
-  transferCash(Player sender, Player receiver, int amount) {
-    if (isPlaying) {
-      Event event = Event(
-        type: EventType.transferCash,
-        dateTime: DateTime.now(),
-        senderId: sender.id,
-        receiverId: receiver.id,
-        amount: amount,
-      );
-      _addEvent(event);
-    }
-  }
-
   // Save the updated board.
   saveBoard() {
     if (isPlaying) {
@@ -197,15 +183,7 @@ class Game extends HiveObject {
   }
 
   _processEvent(Event event) {
-    if (event.type == EventType.transferCash) {
-      Player sender = _players[event.senderId]!;
-      Player receiver = _players[event.receiverId]!;
-      int amount = event.amount!;
-      _playerCash[sender.id] = _playerCash[sender.id]! - amount;
-      _playerCashHistory[sender.id]!.add(CashRecordEntry('Transfer to ${receiver.name}', -amount));
-      _playerCash[receiver.id] = _playerCash[receiver.id]! + amount;
-      _playerCashHistory[receiver.id]!.add(CashRecordEntry('Transfer from ${sender.name}', amount));
-    } else if (event.type == EventType.updateBoard) {
+    if (event.type == EventType.updateBoard) {
       _board.set(event.board!);
     } else if (event.type == EventType.endOfYear) {
       for (Player player in _players.values) {

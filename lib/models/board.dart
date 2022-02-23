@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:hive/hive.dart';
 
 import 'business.dart';
+import 'shop_type.dart';
 
 part 'board.g.dart';
 
@@ -41,7 +42,7 @@ Point? getPropertyLocation(int propertyNumber) {
   return null;
 }
 
-@HiveType(typeId: 8)
+@HiveType(typeId: 6)
 class Board {
   final int minPropertyNumber = 1;
   final int maxPropertyNumber = 85;
@@ -103,8 +104,7 @@ class Board {
 
   List<Business> businesses(String ownerId) {
     List<int> propertyNumbers = propertyOwnerIds.keys
-        .where(
-            (propertyNumber) => propertyOwnerIds[propertyNumber] == ownerId && propertyShops[propertyNumber] != null)
+        .where((propertyNumber) => propertyOwnerIds[propertyNumber] == ownerId && propertyShops[propertyNumber] != null)
         .toList();
     List<List<int>> groups = [];
     while (propertyNumbers.isNotEmpty) {

@@ -7,10 +7,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../views/games_page.dart';
 import 'models/board.dart';
-import 'models/business.dart';
 import 'models/event.dart';
 import 'models/game.dart';
 import 'models/player.dart';
+import 'models/shop_type.dart';
+import 'models/trade.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -19,9 +20,10 @@ void main() async {
   Hive.registerAdapter<EventType>(EventTypeAdapter());
   Hive.registerAdapter<Player>(PlayerAdapter());
   Hive.registerAdapter<PlayerColor>(PlayerColorAdapter());
-  Hive.registerAdapter<Business>(BusinessAdapter());
-  Hive.registerAdapter<ShopType>(ShopTypeAdapter());
   Hive.registerAdapter<Board>(BoardAdapter());
+  Hive.registerAdapter<ShopType>(ShopTypeAdapter());
+  Hive.registerAdapter<Trade>(TradeAdapter());
+  Hive.registerAdapter<TradeItem>(TradeItemAdapter());
   // await Hive.deleteBoxFromDisk('games');
   await Hive.openBox<Game>('games');
   if (Platform.isWindows || Platform.isMacOS) {

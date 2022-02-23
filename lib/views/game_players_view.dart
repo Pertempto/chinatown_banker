@@ -22,7 +22,6 @@ class _GamePlayersViewState extends State<GamePlayersView> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
     return SingleChildScrollView(
       child: Container(
         width: double.infinity,

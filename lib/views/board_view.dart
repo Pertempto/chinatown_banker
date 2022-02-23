@@ -3,8 +3,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 import '../models/board.dart';
-import '../models/business.dart';
 import '../models/game.dart';
+import '../models/shop_type.dart';
 import 'item.dart';
 
 class BoardView extends StatefulWidget {
