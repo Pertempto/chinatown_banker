@@ -6,7 +6,7 @@ import '../models/game.dart';
 import 'board_view.dart';
 import 'game_players_view.dart';
 import 'game_settings_view.dart';
-import 'game_transfers_view.dart';
+import 'game_trades_view.dart';
 
 class GamePage extends StatefulWidget {
   final int gameKey;
@@ -58,7 +58,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   children: [
                     GamePlayersView(game: game),
                     BoardView(game: game),
-                    GameTransfersView(game: game),
+                    GameTradesView(game: game),
                     GameSettingsView(game: game),
                   ],
                 ),

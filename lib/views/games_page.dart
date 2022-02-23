@@ -1,3 +1,4 @@
+import 'package:chinatown_banker/views/player_token.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -43,8 +44,7 @@ class _GamesPageState extends State<GamesPage> {
   Widget _gameWidget(Game game) {
     TextTheme textTheme = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (context) => GamePage(gameKey: game.key))),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => GamePage(gameKey: game.key))),
       child: Card(
         margin: const EdgeInsets.only(bottom: 12),
         child: Padding(
@@ -60,23 +60,7 @@ class _GamesPageState extends State<GamesPage> {
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          margin: const EdgeInsets.all(4),
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: player.tokenColor,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                            border: Border.all(
-                              width: 1,
-                              color: player.tokenColor == Colors.white
-                                  ? Colors.grey
-                                  : Colors.transparent,
-                            ),
-                            // color: Color(player.colorValue),
-                          ),
-                        ),
+                        PlayerToken(player: player, size: 28, margin: const EdgeInsets.all(4)),
                         Text(player.name, style: textTheme.headline6)
                       ],
                     );
@@ -90,8 +74,7 @@ class _GamesPageState extends State<GamesPage> {
 
   _addGame() {
     gamesBox.add(Game.create()).then((gameKey) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => GamePage(gameKey: gameKey)));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => GamePage(gameKey: gameKey)));
     });
   }
 }

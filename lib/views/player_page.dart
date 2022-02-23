@@ -1,3 +1,4 @@
+import 'package:chinatown_banker/views/player_token.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -153,19 +154,7 @@ class _PlayerPageState extends State<PlayerPage> {
       Item(
         title: 'Color',
         subtitle: 'Tap to change',
-        trailing: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: player.tokenColor,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            border: Border.all(
-              width: 1,
-              color: player.contrastColor == Colors.black ? Colors.grey : Colors.transparent,
-            ),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
+        trailing: PlayerToken(player: player, size: 32, margin: const EdgeInsets.all(16)),
         onTap: () => setState(() => game.changePlayerColor(player)),
       ),
     ];

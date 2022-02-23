@@ -6,6 +6,7 @@ import '../models/board.dart';
 import '../models/game.dart';
 import '../models/shop_type.dart';
 import 'item.dart';
+import 'player_token.dart';
 
 class BoardView extends StatefulWidget {
   final Game game;
@@ -238,20 +239,7 @@ class _BoardViewState extends State<BoardView> {
                 ),
                 ...game.players.values.map((player) => Item(
                       title: player.name,
-                      leading: Container(
-                        margin: const EdgeInsets.all(12),
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: player.tokenColor,
-                          borderRadius: const BorderRadius.all(Radius.circular(20)),
-                          border: Border.all(
-                            width: 1,
-                            color: player.tokenColor == Colors.white ? Colors.grey : Colors.transparent,
-                          ),
-                          // color: Color(player.colorValue),
-                        ),
-                      ),
+                      leading: PlayerToken(player: player),
                       onTap: () {
                         Navigator.of(context).pop();
                         setState(() {

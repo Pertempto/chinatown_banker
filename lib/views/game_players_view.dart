@@ -7,6 +7,7 @@ import '../models/player.dart';
 import 'item.dart';
 import 'password_input.dart';
 import 'player_page.dart';
+import 'player_token.dart';
 
 class GamePlayersView extends StatefulWidget {
   final Game game;
@@ -48,20 +49,7 @@ class _GamePlayersViewState extends State<GamePlayersView> {
               List<Business> businesses = game.board.businesses(player.id);
               return Item(
                 title: player.name,
-                leading: Container(
-                  margin: const EdgeInsets.all(12),
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: player.tokenColor,
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    border: Border.all(
-                      width: 1,
-                      color: player.tokenColor == Colors.white ? Colors.grey : Colors.transparent,
-                    ),
-                    // color: Color(player.colorValue),
-                  ),
-                ),
+                leading: PlayerToken(player: player),
                 onTap: () => _openPlayer(player),
                 content: (game.isStarted && businesses.isNotEmpty)
                     ? Padding(
