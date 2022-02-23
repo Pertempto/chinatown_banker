@@ -23,6 +23,8 @@ class _NewTradeState extends State<NewTrade> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Trade'),
@@ -34,6 +36,11 @@ class _NewTradeState extends State<NewTrade> {
           width: double.infinity,
           child: Column(
             children: [
+              if (_selectedPlayers.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+                  child: Text('Trade Partners', style: textTheme.headline4),
+                ),
               ..._selectedPlayers.map((player) => Item(
                     title: player.name,
                     leading: PlayerToken(player: player),
@@ -44,21 +51,118 @@ class _NewTradeState extends State<NewTrade> {
                     }),
                   )),
               if (game.players.values.any((player) => !_selectedPlayers.contains(player)))
-                ElevatedButton.icon(
-                  icon: const Icon(MdiIcons.accountPlus),
-                  label: const Text('Add Player'),
-                  onPressed: () {
-                    _selectPlayer(
-                      title: 'Add Player',
-                      options: game.players.values.where((player) => !_selectedPlayers.contains(player)),
-                      callback: (player) {
-                        setState(() {
-                          _selectedPlayers.add(player);
-                        });
-                      },
-                    );
-                  },
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+                  child: ElevatedButton.icon(
+                    icon: const Icon(MdiIcons.accountPlus),
+                    label: const Text('Add Player'),
+                    onPressed: () {
+                      _selectPlayer(
+                        title: 'Add Player',
+                        options: game.players.values.where((player) => !_selectedPlayers.contains(player)),
+                        callback: (player) {
+                          setState(() {
+                            _selectedPlayers.add(player);
+                          });
+                        },
+                      );
+                    },
+                  ),
                 ),
+              if (_items.isNotEmpty) const Divider(),
+              if (_items.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+                  child: Text('Trade Items', style: textTheme.headline4),
+                ),
+              ..._items.map((item) {
+                Player sender = game.players[item.fromId]!;
+                Player receiver = game.players[item.toId]!;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: const ShapeDecoration(
+                    shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                PlayerToken(player: sender),
+                                Text(sender.name, style: textTheme.headline6!.copyWith(color: Colors.grey.shade800)),
+                              ],
+                            ),
+                          ),
+                          const Expanded(flex: 1, child: Icon(MdiIcons.arrowRight)),
+                          Expanded(
+                            flex: 4,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(receiver.name, style: textTheme.headline6!.copyWith(color: Colors.grey.shade800)),
+                                PlayerToken(player: receiver),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Wrap(
+                          spacing: 8,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                              decoration: ShapeDecoration(
+                                shape: const ContinuousRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(24)),
+                                ),
+                                color: Colors.green.shade700,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
+                                  const SizedBox(width: 8),
+                                  Text('\$50k', style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                              decoration: ShapeDecoration(
+                                shape: const ContinuousRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(24)),
+                                ),
+                                color: Colors.blue.shade700,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(MdiIcons.store, color: colorScheme.onPrimary, size: 32),
+                                  const SizedBox(width: 8),
+                                  Text('#84', style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 80),
             ],
           ),
         ),
@@ -76,7 +180,9 @@ class _NewTradeState extends State<NewTrade> {
                       title: 'Receiver',
                       options: _selectedPlayers.where((player) => player != sender),
                       callback: (receiver) {
-                        _items.add(TradeItem(fromId: sender.id, toId: receiver.id, cash: 0, propertyNumbers: []));
+                        setState(() {
+                          _items.add(TradeItem(fromId: sender.id, toId: receiver.id, cash: 0, propertyNumbers: []));
+                        });
                       },
                     );
                   },

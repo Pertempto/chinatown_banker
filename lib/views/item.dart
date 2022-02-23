@@ -28,14 +28,14 @@ class Item extends StatelessWidget {
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
-      margin: EdgeInsets.only(bottom: small ? 2 : 8),
+      margin: EdgeInsets.only(bottom: small ? 4 : 8),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: EdgeInsets.only(left: leading == null ? 16 : 0),
           width: double.infinity,
           decoration: ShapeDecoration(
-            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(small ? 8 : 32))),
             color: backgroundColor,
           ),
           child: Column(
