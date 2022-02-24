@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/business.dart';
 import '../models/game.dart';
 import '../models/player.dart';
+import 'game_results.dart';
 import 'item.dart';
 import 'password_input.dart';
 import 'player_page.dart';
@@ -38,9 +39,20 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (!game.isStarted)
-                      TextButton(onPressed: game.canStart ? game.start : null, child: const Text('Start')),
-                    if (game.canGoBack) TextButton(onPressed: game.goBack, child: const Text('Back')),
-                    if (game.isPlaying) TextButton(onPressed: game.completeYear, child: const Text('Next Year')),
+                      TextButton(
+                          onPressed: game.canStart ? game.start : null,
+                          child: const Text('Start')),
+                    if (game.canGoBack)
+                      TextButton(
+                          onPressed: game.goBack, child: const Text('Back')),
+                    if (game.isPlaying)
+                      TextButton(
+                          onPressed: game.completeYear,
+                          child: const Text('Next Year')),
+                    if (game.isComplete)
+                      TextButton(
+                          onPressed: _showFinalResults,
+                          child: const Text('Results')),
                   ],
                 ),
               ),
@@ -57,7 +69,9 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                         child: Wrap(
                           spacing: 4,
                           runSpacing: 4,
-                          children: businesses.map((b) => _businessWidget(b, player)).toList(),
+                          children: businesses
+                              .map((b) => _businessWidget(b, player))
+                              .toList(),
                         ),
                       )
                     : null,
@@ -81,7 +95,10 @@ class _GamePlayersViewState extends State<GamePlayersView> {
   _openPlayer(Player player) async {
     if (player.password.isEmpty) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PlayerPage(gameKey: game.key, playerId: player.id)));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  PlayerPage(gameKey: game.key, playerId: player.id)));
       return;
     }
     if (kDebugMode) {
@@ -89,7 +106,8 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     }
     String? password = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)),
+      MaterialPageRoute(
+          builder: (context) => const PasswordInput(isNewPassword: false)),
     );
     if (password == null) {
       return;
@@ -101,7 +119,9 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => PlayerPage(gameKey: game.key, playerId: player.id)),
+        MaterialPageRoute(
+            builder: (context) =>
+                PlayerPage(gameKey: game.key, playerId: player.id)),
       );
     }
   }
@@ -112,13 +132,21 @@ class _GamePlayersViewState extends State<GamePlayersView> {
     return Container(
       child: Text(business.toString(),
           style: textTheme.bodyText1!.copyWith(
-            color: business.color.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+            color: business.color.computeLuminance() > 0.5
+                ? Colors.black
+                : Colors.white,
           )),
       padding: const EdgeInsets.all(8),
       decoration: ShapeDecoration(
-        shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape:
+            ContinuousRectangleBorder(borderRadius: BorderRadius.circular(24)),
         color: business.color,
       ),
     );
+  }
+
+  void _showFinalResults() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => GameResults(game: game)));
   }
 }

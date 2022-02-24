@@ -28,7 +28,6 @@ class _NewTradeState extends State<NewTrade> {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
     List<int> alreadyTradeProperties = [];
     for (TradeItem item in _items) {
       alreadyTradeProperties.addAll(item.propertyNumbers);
@@ -36,7 +35,10 @@ class _NewTradeState extends State<NewTrade> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Trade'),
-        actions: [IconButton(onPressed: _completeTrade, icon: const Icon(MdiIcons.check))],
+        actions: [
+          IconButton(
+              onPressed: _completeTrade, icon: const Icon(MdiIcons.check))
+        ],
       ),
       backgroundColor: Colors.grey.shade300,
       body: SingleChildScrollView(
@@ -56,10 +58,13 @@ class _NewTradeState extends State<NewTrade> {
                     trailing: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Icon(MdiIcons.check,
-                            color: (_playerApproval[player.id] ?? false) ? Colors.black : Colors.grey)),
+                            color: (_playerApproval[player.id] ?? false)
+                                ? Colors.black
+                                : Colors.grey)),
                     onTap: () => _playerDialog(player),
                   )),
-              if (game.players.values.any((player) => !_selectedPlayers.contains(player)))
+              if (game.players.values
+                  .any((player) => !_selectedPlayers.contains(player)))
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
                   child: ElevatedButton.icon(
@@ -68,7 +73,8 @@ class _NewTradeState extends State<NewTrade> {
                     onPressed: () {
                       _selectPlayer(
                         title: 'Add Player',
-                        options: game.players.values.where((player) => !_selectedPlayers.contains(player)),
+                        options: game.players.values.where(
+                            (player) => !_selectedPlayers.contains(player)),
                         callback: (player) {
                           setState(() {
                             _selectedPlayers.add(player);
@@ -88,8 +94,9 @@ class _NewTradeState extends State<NewTrade> {
                 return TradeItemView(
                   game: game,
                   item: item,
-                  onCashTap: () =>
-                      _selectCash(currentCash: item.cash, callback: (cash) => setState(() => item.cash = cash)),
+                  onCashTap: () => _selectCash(
+                      currentCash: item.cash,
+                      callback: (cash) => setState(() => item.cash = cash)),
                   bottom: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
@@ -100,7 +107,8 @@ class _NewTradeState extends State<NewTrade> {
                               title: 'Add Property',
                               options: game.board
                                   .getPropertyNumbers(item.fromId)
-                                  .where((n) => !alreadyTradeProperties.contains(n)),
+                                  .where((n) =>
+                                      !alreadyTradeProperties.contains(n)),
                               callback: (propertyNumber) {
                                 setState(() {
                                   item.propertyNumbers.add(propertyNumber);
@@ -144,11 +152,16 @@ class _NewTradeState extends State<NewTrade> {
                   callback: (sender) {
                     _selectPlayer(
                       title: 'Receiver',
-                      options: _selectedPlayers.where((player) => player != sender),
+                      options:
+                          _selectedPlayers.where((player) => player != sender),
                       callback: (receiver) {
                         setState(() {
                           _playerApproval.clear();
-                          _items.add(TradeItem(fromId: sender.id, toId: receiver.id, cash: 0, propertyNumbers: []));
+                          _items.add(TradeItem(
+                              fromId: sender.id,
+                              toId: receiver.id,
+                              cash: 0,
+                              propertyNumbers: []));
                         });
                       },
                     );
@@ -164,15 +177,18 @@ class _NewTradeState extends State<NewTrade> {
       _errorMessage('No trade items');
       return;
     }
-    if (!_items.every((item) => item.cash != 0 || item.propertyNumbers.isNotEmpty)) {
+    if (!_items
+        .every((item) => item.cash != 0 || item.propertyNumbers.isNotEmpty)) {
       _errorMessage('Some of the trade items are empty.');
       return;
     }
-    Map<String, int> moneySpent = Map.fromEntries(_selectedPlayers.map((player) => MapEntry(player.id, 0)));
+    Map<String, int> moneySpent = Map.fromEntries(
+        _selectedPlayers.map((player) => MapEntry(player.id, 0)));
     for (TradeItem item in _items) {
       moneySpent[item.fromId] = moneySpent[item.fromId]! + item.cash;
     }
-    if (_selectedPlayers.any((player) => moneySpent[player.id]! > game.playerCash(player))) {
+    if (_selectedPlayers
+        .any((player) => moneySpent[player.id]! > game.playerCash(player))) {
       _errorMessage('Some player has insufficient funds.');
       return;
     }
@@ -200,8 +216,12 @@ class _NewTradeState extends State<NewTrade> {
         return AlertDialog(
           backgroundColor: Colors.red,
           contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-          title: Text('Invalid Trade', style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-          content: Text(message, style: textTheme.subtitle1!.copyWith(color: colorScheme.onPrimary)),
+          title: Text('Invalid Trade',
+              style:
+                  textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+          content: Text(message,
+              style:
+                  textTheme.subtitle1!.copyWith(color: colorScheme.onPrimary)),
         );
       },
     );
@@ -228,7 +248,11 @@ class _NewTradeState extends State<NewTrade> {
                     setState(() {
                       _selectedPlayers.remove(player);
                       _playerApproval.clear();
-                      _items = _items.where((item) => item.toId != player.id && item.fromId != player.id).toList();
+                      _items = _items
+                          .where((item) =>
+                              item.toId != player.id &&
+                              item.fromId != player.id)
+                          .toList();
                     });
                   },
                 ),
@@ -261,13 +285,17 @@ class _NewTradeState extends State<NewTrade> {
                       if (player.password.isEmpty) {
                         giveApproval();
                       } else {
-                        String? password = await Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)));
+                        String? password = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const PasswordInput(isNewPassword: false)));
                         if (password == null) {
                           return;
                         } else if (password != player.password) {
                           Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
                             content: Text('Incorrect password.'),
                             duration: Duration(milliseconds: 2000),
                           ));
@@ -283,7 +311,10 @@ class _NewTradeState extends State<NewTrade> {
         });
   }
 
-  _selectPlayer({required String title, required Iterable<Player> options, required Function(Player) callback}) {
+  _selectPlayer(
+      {required String title,
+      required Iterable<Player> options,
+      required Function(Player) callback}) {
     showDialog(
         context: context,
         builder: (context) {
@@ -321,7 +352,9 @@ class _NewTradeState extends State<NewTrade> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('\$${currentCash}k', style: textTheme.headline2!.copyWith(color: colorScheme.onPrimary)),
+                  Text('\$${currentCash}k',
+                      style: textTheme.headline2!
+                          .copyWith(color: colorScheme.onPrimary)),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -331,7 +364,8 @@ class _NewTradeState extends State<NewTrade> {
                           currentCash = 0;
                           callback(currentCash);
                         }),
-                        icon: Icon(MdiIcons.cashRemove, color: colorScheme.onPrimary),
+                        icon: Icon(MdiIcons.cashRemove,
+                            color: colorScheme.onPrimary),
                       ),
                       IconButton(
                         onPressed: currentCash < 10
@@ -340,21 +374,24 @@ class _NewTradeState extends State<NewTrade> {
                                   currentCash -= 10;
                                   callback(currentCash);
                                 }),
-                        icon: Icon(MdiIcons.cashMinus, color: colorScheme.onPrimary),
+                        icon: Icon(MdiIcons.cashMinus,
+                            color: colorScheme.onPrimary),
                       ),
                       IconButton(
                         onPressed: () => innerSetState(() {
                           currentCash += 10;
                           callback(currentCash);
                         }),
-                        icon: Icon(MdiIcons.cashPlus, color: colorScheme.onPrimary),
+                        icon: Icon(MdiIcons.cashPlus,
+                            color: colorScheme.onPrimary),
                       ),
                       IconButton(
                         onPressed: () => innerSetState(() {
                           currentCash += 100;
                           callback(currentCash);
                         }),
-                        icon: Icon(MdiIcons.cash100, color: colorScheme.onPrimary),
+                        icon: Icon(MdiIcons.cash100,
+                            color: colorScheme.onPrimary),
                       ),
                     ],
                   ),
@@ -365,7 +402,10 @@ class _NewTradeState extends State<NewTrade> {
         });
   }
 
-  _selectPropertyNumber({required String title, required Iterable<int> options, required Function(int) callback}) {
+  _selectPropertyNumber(
+      {required String title,
+      required Iterable<int> options,
+      required Function(int) callback}) {
     showDialog(
         context: context,
         builder: (context) {
@@ -400,7 +440,9 @@ class _NewTradeState extends State<NewTrade> {
           contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           content: const Text('Are you sure?'),
           actions: <Widget>[
-            TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(context).pop()),
+            TextButton(
+                child: const Text('Cancel'),
+                onPressed: () => Navigator.of(context).pop()),
             TextButton(
               child: const Text('Remove'),
               onPressed: () {
