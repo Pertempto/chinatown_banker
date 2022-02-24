@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 class Item extends StatelessWidget {
   final String title;
   final Color backgroundColor;
+  final TextStyle? textStyle;
   final IconData? iconData;
   final Widget? leading;
   final Widget? trailing;
   final String? subtitle;
   final Widget? content;
   final VoidCallback? onTap;
-  final bool small;
 
   const Item({
     Key? key,
     required this.title,
     this.backgroundColor = Colors.white,
-    this.small = false,
+    this.textStyle,
     this.iconData,
     this.leading,
     this.trailing,
@@ -28,14 +28,14 @@ class Item extends StatelessWidget {
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
-      margin: EdgeInsets.only(bottom: small ? 4 : 8),
+      margin: const EdgeInsets.only(bottom: 8),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: EdgeInsets.only(left: leading == null ? 16 : 0),
           width: double.infinity,
           decoration: ShapeDecoration(
-            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(small ? 8 : 32))),
+            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
             color: backgroundColor,
           ),
           child: Column(
@@ -45,10 +45,10 @@ class Item extends StatelessWidget {
                 children: [
                   if (leading != null) leading!,
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: small ? 1 : 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Text(
                       title,
-                      style: (small ? textTheme.headline6 : textTheme.headline4)!.copyWith(
+                      style: (textStyle ?? textTheme.headline4!).copyWith(
                         color: backgroundColor.computeLuminance() > 0.5 ? Colors.grey.shade800 : Colors.white,
                       ),
                     ),

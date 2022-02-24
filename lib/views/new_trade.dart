@@ -5,6 +5,7 @@ import '../models/game.dart';
 import '../models/player.dart';
 import '../models/trade.dart';
 import 'item.dart';
+import 'password_input.dart';
 import 'player_token.dart';
 
 class NewTrade extends StatefulWidget {
@@ -19,6 +20,7 @@ class NewTrade extends StatefulWidget {
 class _NewTradeState extends State<NewTrade> {
   late Game game = widget.game;
   final List<Player> _selectedPlayers = [];
+  final Map<String, bool> _playerApproval = {};
   List<TradeItem> _items = [];
 
   @override
@@ -32,23 +34,7 @@ class _NewTradeState extends State<NewTrade> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Trade'),
-        actions: [
-          if (_items.isNotEmpty)
-            IconButton(
-              onPressed: () {
-                // TODO: add process where players must verify their identity before trade is complete.
-                Navigator.of(context).pop();
-                // Only include the players that actually participated in the trade items.
-                Set<String> partyIds = {};
-                for (TradeItem item in _items) {
-                  partyIds.add(item.fromId);
-                  partyIds.add(item.toId);
-                }
-                game.addTrade(Trade(partyIds: partyIds.toList(), tradeItems: _items));
-              },
-              icon: const Icon(MdiIcons.check),
-            ),
-        ],
+        actions: [IconButton(onPressed: _completeTrade, icon: const Icon(MdiIcons.check))],
       ),
       backgroundColor: Colors.grey.shade300,
       body: SingleChildScrollView(
@@ -65,11 +51,11 @@ class _NewTradeState extends State<NewTrade> {
               ..._selectedPlayers.map((player) => Item(
                     title: player.name,
                     leading: PlayerToken(player: player),
-                    trailing: const Padding(padding: EdgeInsets.all(16), child: Text('Tap to remove')),
-                    onTap: () => setState(() {
-                      _selectedPlayers.remove(player);
-                      _items = _items.where((item) => item.toId != player.id && item.fromId != player.id).toList();
-                    }),
+                    trailing: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Icon(MdiIcons.check,
+                            color: (_playerApproval[player.id] ?? false) ? Colors.black : Colors.grey)),
+                    onTap: () => _playerDialog(player),
                   )),
               if (game.players.values.any((player) => !_selectedPlayers.contains(player)))
                 Padding(
@@ -158,14 +144,11 @@ class _NewTradeState extends State<NewTrade> {
                                       style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
                                 ],
                               ),
-                              onTap: () {
-                                print('hello!');
-                                _selectCash(
-                                    currentCash: item.cash,
-                                    callback: (cash) {
-                                      setState(() => item.cash = cash);
-                                    });
-                              },
+                              onTap: () => _selectCash(
+                                  currentCash: item.cash,
+                                  callback: (cash) {
+                                    setState(() => item.cash = cash);
+                                  }),
                             ),
                           ),
                           ...item.propertyNumbers
@@ -231,6 +214,7 @@ class _NewTradeState extends State<NewTrade> {
                       options: _selectedPlayers.where((player) => player != sender),
                       callback: (receiver) {
                         setState(() {
+                          _playerApproval.clear();
                           _items.add(TradeItem(fromId: sender.id, toId: receiver.id, cash: 0, propertyNumbers: []));
                         });
                       },
@@ -240,6 +224,130 @@ class _NewTradeState extends State<NewTrade> {
               },
             ),
     );
+  }
+
+  _completeTrade() {
+    if (_items.isEmpty) {
+      _errorMessage('No trade items');
+      return;
+    }
+    if (!_items.every((item) => item.cash != 0 || item.propertyNumbers.isNotEmpty)) {
+      _errorMessage('Some of the trade items are empty.');
+      return;
+    }
+    Map<String, int> moneySpent = Map.fromEntries(_selectedPlayers.map((player) => MapEntry(player.id, 0)));
+    for (TradeItem item in _items) {
+      moneySpent[item.fromId] = moneySpent[item.fromId]! + item.cash;
+    }
+    if (_selectedPlayers.any((player) => moneySpent[player.id]! > game.playerCash(player))) {
+      _errorMessage('Some player has insufficient funds.');
+      return;
+    }
+    if (_selectedPlayers.any((player) => _playerApproval[player.id] != true)) {
+      _errorMessage('Trade has not received full approval.');
+      return;
+    }
+
+    Navigator.of(context).pop();
+    // Only include the players that actually participated in the trade items.
+    Set<String> partyIds = {};
+    for (TradeItem item in _items) {
+      partyIds.add(item.fromId);
+      partyIds.add(item.toId);
+    }
+    game.addTrade(Trade(partyIds: partyIds.toList(), tradeItems: _items));
+  }
+
+  _errorMessage(String message) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+          title: Text('Invalid Trade', style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
+          content: Text(message, style: textTheme.subtitle1!.copyWith(color: colorScheme.onPrimary)),
+        );
+      },
+    );
+  }
+
+  _playerDialog(Player player) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.grey.shade300,
+            contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Item(
+                  title: 'Remove',
+                  backgroundColor: Colors.red,
+                  textStyle: textTheme.headline5,
+                  iconData: MdiIcons.delete,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _selectedPlayers.remove(player);
+                      _playerApproval.clear();
+                      _items = _items.where((item) => item.toId != player.id && item.fromId != player.id).toList();
+                    });
+                  },
+                ),
+                if (_playerApproval[player.id] == true)
+                  Item(
+                      title: 'Disapprove',
+                      backgroundColor: Colors.blue,
+                      textStyle: textTheme.headline5,
+                      iconData: MdiIcons.check,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          _playerApproval[player.id] = false;
+                        });
+                      }),
+                if (_playerApproval[player.id] != true)
+                  Item(
+                    title: 'Approve',
+                    backgroundColor: Colors.blue,
+                    textStyle: textTheme.headline5,
+                    iconData: MdiIcons.check,
+                    onTap: () async {
+                      void giveApproval() {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          _playerApproval[player.id] = true;
+                        });
+                      }
+
+                      if (player.password.isEmpty) {
+                        giveApproval();
+                      } else {
+                        String? password = await Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => const PasswordInput(isNewPassword: false)));
+                        if (password == null) {
+                          return;
+                        } else if (password != player.password) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('Incorrect password.'),
+                            duration: Duration(milliseconds: 2000),
+                          ));
+                        } else {
+                          giveApproval();
+                        }
+                      }
+                    },
+                  ),
+              ],
+            ),
+          );
+        });
   }
 
   _selectPlayer({required String title, required Iterable<Player> options, required Function(Player) callback}) {
@@ -286,27 +394,34 @@ class _NewTradeState extends State<NewTrade> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => innerSetState(() => currentCash = 0),
+                        onPressed: () => innerSetState(() {
+                          currentCash = 0;
+                          callback(currentCash);
+                        }),
                         icon: Icon(MdiIcons.cashRemove, color: colorScheme.onPrimary),
                       ),
                       IconButton(
-                        onPressed: currentCash < 10 ? null : () => innerSetState(() => currentCash -= 10),
+                        onPressed: currentCash < 10
+                            ? null
+                            : () => innerSetState(() {
+                                  currentCash -= 10;
+                                  callback(currentCash);
+                                }),
                         icon: Icon(MdiIcons.cashMinus, color: colorScheme.onPrimary),
                       ),
                       IconButton(
-                        onPressed: () => innerSetState(() => currentCash += 10),
+                        onPressed: () => innerSetState(() {
+                          currentCash += 10;
+                          callback(currentCash);
+                        }),
                         icon: Icon(MdiIcons.cashPlus, color: colorScheme.onPrimary),
                       ),
                       IconButton(
-                        onPressed: () => innerSetState(() => currentCash += 100),
-                        icon: Icon(MdiIcons.cash100, color: colorScheme.onPrimary),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
+                        onPressed: () => innerSetState(() {
+                          currentCash += 100;
                           callback(currentCash);
-                        },
-                        icon: Icon(MdiIcons.check, color: colorScheme.onPrimary),
+                        }),
+                        icon: Icon(MdiIcons.cash100, color: colorScheme.onPrimary),
                       ),
                     ],
                   ),
@@ -385,7 +500,10 @@ class _NewTradeState extends State<NewTrade> {
             TextButton(
               child: const Text('Remove'),
               onPressed: () {
-                setState(() => _items.remove(item));
+                setState(() {
+                  _playerApproval.clear();
+                  _items.remove(item);
+                });
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(primary: Colors.red),
