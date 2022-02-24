@@ -222,7 +222,6 @@ class _BoardViewState extends State<BoardView> {
         builder: (context) {
           return AlertDialog(
             backgroundColor: Colors.grey.shade300,
-            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
             contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -276,7 +275,6 @@ class _BoardViewState extends State<BoardView> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.grey.shade300,
-          shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
           contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
           content: SingleChildScrollView(
             child: Column(

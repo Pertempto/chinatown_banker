@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -27,6 +25,10 @@ class _NewTradeState extends State<NewTrade> {
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    List<int> alreadyTradeProperties = [];
+    for (TradeItem item in _items) {
+      alreadyTradeProperties.addAll(item.propertyNumbers);
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Trade'),
@@ -143,34 +145,17 @@ class _NewTradeState extends State<NewTrade> {
                                 ],
                               ),
                               onTap: () {
-                                // TODO: change cash amount.
+                                print('hello!');
+                                _selectCash(
+                                    currentCash: item.cash,
+                                    callback: (cash) {
+                                      setState(() => item.cash = cash);
+                                    });
                               },
                             ),
                           ),
-                          ...item.propertyNumbers.map((propertyNumber) => Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                decoration: ShapeDecoration(
-                                  shape: const ContinuousRectangleBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(24)),
-                                  ),
-                                  color: Colors.blue.shade700,
-                                ),
-                                child: GestureDetector(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(MdiIcons.store, color: colorScheme.onPrimary, size: 32),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '#$propertyNumber',
-                                        style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary),
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () => setState(() => item.propertyNumbers.remove(propertyNumber)),
-                                ),
-                              )),
+                          ...item.propertyNumbers
+                              .map((propertyNumber) => _propertyItem(propertyNumber: propertyNumber)),
                         ],
                       ),
                       Padding(
@@ -179,15 +164,31 @@ class _NewTradeState extends State<NewTrade> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              onPressed: () => setState(() {
-                                // TODO: show dialog to select property number
-                                Random rand = Random();
-                                item.propertyNumbers.add(rand.nextInt(85) + 1);
-                              }),
+                              onPressed: () => _selectPropertyNumber(
+                                  title: 'Add Property',
+                                  options: game.board
+                                      .getPropertyNumbers(item.fromId)
+                                      .where((n) => !alreadyTradeProperties.contains(n)),
+                                  callback: (propertyNumber) {
+                                    setState(() {
+                                      item.propertyNumbers.add(propertyNumber);
+                                    });
+                                  }),
                               icon: const Icon(MdiIcons.storePlus),
                             ),
                             IconButton(
-                              onPressed: () => setState(() => _items.remove(item)),
+                              onPressed: () => _selectPropertyNumber(
+                                  title: 'Remove Property',
+                                  options: item.propertyNumbers,
+                                  callback: (propertyNumber) {
+                                    setState(() {
+                                      item.propertyNumbers.remove(propertyNumber);
+                                    });
+                                  }),
+                              icon: const Icon(MdiIcons.storeMinus),
+                            ),
+                            IconButton(
+                              onPressed: () => _removeTradeItem(item),
                               icon: const Icon(MdiIcons.close),
                             ),
                           ],
@@ -233,7 +234,6 @@ class _NewTradeState extends State<NewTrade> {
         builder: (context) {
           return AlertDialog(
             backgroundColor: Colors.grey.shade300,
-            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
             title: Text(title),
             contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             content: Column(
@@ -251,5 +251,134 @@ class _NewTradeState extends State<NewTrade> {
             ),
           );
         });
+  }
+
+  _selectCash({required int currentCash, required Function(int) callback}) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, innerSetState) {
+            return AlertDialog(
+              backgroundColor: Colors.green.shade700,
+              contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('\$${currentCash}k', style: textTheme.headline2!.copyWith(color: colorScheme.onPrimary)),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () => innerSetState(() => currentCash = 0),
+                        icon: Icon(MdiIcons.cashRemove, color: colorScheme.onPrimary),
+                      ),
+                      IconButton(
+                        onPressed: currentCash < 10 ? null : () => innerSetState(() => currentCash -= 10),
+                        icon: Icon(MdiIcons.cashMinus, color: colorScheme.onPrimary),
+                      ),
+                      IconButton(
+                        onPressed: () => innerSetState(() => currentCash += 10),
+                        icon: Icon(MdiIcons.cashPlus, color: colorScheme.onPrimary),
+                      ),
+                      IconButton(
+                        onPressed: () => innerSetState(() => currentCash += 100),
+                        icon: Icon(MdiIcons.cash100, color: colorScheme.onPrimary),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          callback(currentCash);
+                        },
+                        icon: Icon(MdiIcons.check, color: colorScheme.onPrimary),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          });
+        });
+  }
+
+  Widget _propertyItem({required propertyNumber, VoidCallback? onTap}) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: ShapeDecoration(
+        shape: const ContinuousRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+        ),
+        color: Colors.blue.shade700,
+      ),
+      child: GestureDetector(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(MdiIcons.store, color: colorScheme.onPrimary, size: 32),
+            const SizedBox(width: 8),
+            Text(
+              '#$propertyNumber',
+              style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary),
+            ),
+          ],
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  _selectPropertyNumber({required String title, required Iterable<int> options, required Function(int) callback}) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.grey.shade300,
+            title: Text(title),
+            contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            content: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ...options.map((propertyNumber) => _propertyItem(
+                      propertyNumber: propertyNumber,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        callback(propertyNumber);
+                      },
+                    ))
+              ],
+            ),
+          );
+        });
+  }
+
+  /* Allow the user to remove an item. */
+  _removeTradeItem(TradeItem item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Remove Trade Item'),
+          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+          content: const Text('Are you sure?'),
+          actions: <Widget>[
+            TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(context).pop()),
+            TextButton(
+              child: const Text('Remove'),
+              onPressed: () {
+                setState(() => _items.remove(item));
+                Navigator.pop(context);
+              },
+              style: TextButton.styleFrom(primary: Colors.red),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

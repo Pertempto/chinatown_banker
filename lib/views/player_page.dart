@@ -109,7 +109,6 @@ class _PlayerPageState extends State<PlayerPage> {
         builder: (context) {
           return AlertDialog(
             backgroundColor: Colors.green.shade700,
-            shape: const ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
             contentPadding: const EdgeInsets.all(24),
             content: Column(
               mainAxisSize: MainAxisSize.min,

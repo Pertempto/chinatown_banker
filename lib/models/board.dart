@@ -149,4 +149,8 @@ class Board {
     }
     return businesses;
   }
+
+  Iterable<int> getPropertyNumbers(String ownerId) {
+    return propertyOwnerIds.keys.where((propertyNumber) => propertyOwnerIds[propertyNumber] == ownerId);
+  }
 }

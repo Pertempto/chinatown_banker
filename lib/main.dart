@@ -52,6 +52,9 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
+          dialogTheme: const DialogTheme(
+            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+          )
         ),
         debugShowCheckedModeBanner: false,
         home: const GamesPage());
