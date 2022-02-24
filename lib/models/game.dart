@@ -5,6 +5,7 @@ import 'board.dart';
 import 'business.dart';
 import 'event.dart';
 import 'player.dart';
+import 'trade.dart';
 
 part 'game.g.dart';
 
@@ -72,6 +73,8 @@ class Game extends HiveObject {
       return year.toString();
     }
   }
+
+  Iterable<Event> get tradeEvents => _events.where((e) => e.type == EventType.trade);
 
   Game.create()
       : _date = DateTime.now(),
@@ -165,6 +168,14 @@ class Game extends HiveObject {
     }
   }
 
+  // Add a trade.
+  addTrade(Trade trade) {
+    if (isPlaying) {
+      Event event = Event(type: EventType.trade, dateTime: DateTime.now(), trade: trade);
+      _addEvent(event);
+    }
+  }
+
   _addEvent(Event event) {
     _events.add(event);
     _processEvent(event);
@@ -185,6 +196,22 @@ class Game extends HiveObject {
   _processEvent(Event event) {
     if (event.type == EventType.updateBoard) {
       _board.set(event.board!);
+    } else if (event.type == EventType.trade) {}
+    if (event.type == EventType.trade) {
+      for (TradeItem item in event.trade!.tradeItems) {
+        Player sender = _players[item.fromId]!;
+        Player receiver = _players[item.toId]!;
+        int amount = item.cash;
+        if (amount != 0) {
+          _playerCash[sender.id] = _playerCash[sender.id]! - amount;
+          _playerCashHistory[sender.id]!.add(CashRecordEntry('Trade to ${receiver.name}', -amount));
+          _playerCash[receiver.id] = _playerCash[receiver.id]! + amount;
+          _playerCashHistory[receiver.id]!.add(CashRecordEntry('Trade from ${sender.name}', amount));
+        }
+        for (int propertyNumber in item.propertyNumbers) {
+          board.setOwnerId(propertyNumber, item.toId);
+        }
+      }
     } else if (event.type == EventType.endOfYear) {
       for (Player player in _players.values) {
         int income = 0;

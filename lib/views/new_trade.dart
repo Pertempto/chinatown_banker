@@ -33,7 +33,21 @@ class _NewTradeState extends State<NewTrade> {
       appBar: AppBar(
         title: const Text('New Trade'),
         actions: [
-          if (_items.isNotEmpty) IconButton(onPressed: () {}, icon: const Icon(MdiIcons.check)),
+          if (_items.isNotEmpty)
+            IconButton(
+              onPressed: () {
+                // TODO: add process where players must verify their identity before trade is complete.
+                Navigator.of(context).pop();
+                // Only include the players that actually participated in the trade items.
+                Set<String> partyIds = {};
+                for (TradeItem item in _items) {
+                  partyIds.add(item.fromId);
+                  partyIds.add(item.toId);
+                }
+                game.addTrade(Trade(partyIds: partyIds.toList(), tradeItems: _items));
+              },
+              icon: const Icon(MdiIcons.check),
+            ),
         ],
       ),
       backgroundColor: Colors.grey.shade300,
