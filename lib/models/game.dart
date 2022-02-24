@@ -112,7 +112,6 @@ class Game extends HiveObject {
   completeYear() {
     if (isStarted) {
       _addEvent(Event(type: EventType.endOfYear, dateTime: DateTime.now()));
-      _addEvent(Event(type: EventType.updateBoard, dateTime: DateTime.now(), board: board.copy()));
     }
   }
 

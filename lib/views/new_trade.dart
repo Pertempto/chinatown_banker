@@ -7,6 +7,8 @@ import '../models/trade.dart';
 import 'item.dart';
 import 'password_input.dart';
 import 'player_token.dart';
+import 'property_number_item.dart';
+import 'trade_item_view.dart';
 
 class NewTrade extends StatefulWidget {
   final Game game;
@@ -83,115 +85,46 @@ class _NewTradeState extends State<NewTrade> {
                   child: Text('Trade Items', style: textTheme.headline4),
                 ),
               ..._items.map((item) {
-                Player sender = game.players[item.fromId]!;
-                Player receiver = game.players[item.toId]!;
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: const ShapeDecoration(
-                    shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            flex: 4,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                PlayerToken(player: sender),
-                                Text(sender.name, style: textTheme.headline6!.copyWith(color: Colors.grey.shade800)),
-                              ],
-                            ),
-                          ),
-                          const Expanded(flex: 1, child: Icon(MdiIcons.arrowRight)),
-                          Expanded(
-                            flex: 4,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(receiver.name, style: textTheme.headline6!.copyWith(color: Colors.grey.shade800)),
-                                PlayerToken(player: receiver),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                            decoration: ShapeDecoration(
-                              shape: const ContinuousRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(24)),
-                              ),
-                              color: Colors.green.shade700,
-                            ),
-                            child: GestureDetector(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(MdiIcons.cash, color: colorScheme.onPrimary, size: 32),
-                                  const SizedBox(width: 8),
-                                  Text('\$${item.cash}k',
-                                      style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary)),
-                                ],
-                              ),
-                              onTap: () => _selectCash(
-                                  currentCash: item.cash,
-                                  callback: (cash) {
-                                    setState(() => item.cash = cash);
-                                  }),
-                            ),
-                          ),
-                          ...item.propertyNumbers
-                              .map((propertyNumber) => _propertyItem(propertyNumber: propertyNumber)),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () => _selectPropertyNumber(
-                                  title: 'Add Property',
-                                  options: game.board
-                                      .getPropertyNumbers(item.fromId)
-                                      .where((n) => !alreadyTradeProperties.contains(n)),
-                                  callback: (propertyNumber) {
-                                    setState(() {
-                                      item.propertyNumbers.add(propertyNumber);
-                                    });
-                                  }),
-                              icon: const Icon(MdiIcons.storePlus),
-                            ),
-                            IconButton(
-                              onPressed: () => _selectPropertyNumber(
-                                  title: 'Remove Property',
-                                  options: item.propertyNumbers,
-                                  callback: (propertyNumber) {
-                                    setState(() {
-                                      item.propertyNumbers.remove(propertyNumber);
-                                    });
-                                  }),
-                              icon: const Icon(MdiIcons.storeMinus),
-                            ),
-                            IconButton(
-                              onPressed: () => _removeTradeItem(item),
-                              icon: const Icon(MdiIcons.close),
-                            ),
-                          ],
+                return TradeItemView(
+                  game: game,
+                  item: item,
+                  onCashTap: () =>
+                      _selectCash(currentCash: item.cash, callback: (cash) => setState(() => item.cash = cash)),
+                  bottom: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => _selectPropertyNumber(
+                              title: 'Add Property',
+                              options: game.board
+                                  .getPropertyNumbers(item.fromId)
+                                  .where((n) => !alreadyTradeProperties.contains(n)),
+                              callback: (propertyNumber) {
+                                setState(() {
+                                  item.propertyNumbers.add(propertyNumber);
+                                });
+                              }),
+                          icon: const Icon(MdiIcons.storePlus),
                         ),
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () => _selectPropertyNumber(
+                              title: 'Remove Property',
+                              options: item.propertyNumbers,
+                              callback: (propertyNumber) {
+                                setState(() {
+                                  item.propertyNumbers.remove(propertyNumber);
+                                });
+                              }),
+                          icon: const Icon(MdiIcons.storeMinus),
+                        ),
+                        IconButton(
+                          onPressed: () => _removeTradeItem(item),
+                          icon: const Icon(MdiIcons.close),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),
@@ -432,35 +365,6 @@ class _NewTradeState extends State<NewTrade> {
         });
   }
 
-  Widget _propertyItem({required propertyNumber, VoidCallback? onTap}) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: ShapeDecoration(
-        shape: const ContinuousRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(24)),
-        ),
-        color: Colors.blue.shade700,
-      ),
-      child: GestureDetector(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(MdiIcons.store, color: colorScheme.onPrimary, size: 32),
-            const SizedBox(width: 8),
-            Text(
-              '#$propertyNumber',
-              style: textTheme.headline6!.copyWith(color: colorScheme.onPrimary),
-            ),
-          ],
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
-
   _selectPropertyNumber({required String title, required Iterable<int> options, required Function(int) callback}) {
     showDialog(
         context: context,
@@ -473,7 +377,7 @@ class _NewTradeState extends State<NewTrade> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                ...options.map((propertyNumber) => _propertyItem(
+                ...options.map((propertyNumber) => PropertyNumberItem(
                       propertyNumber: propertyNumber,
                       onTap: () {
                         Navigator.of(context).pop();
