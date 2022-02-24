@@ -52,6 +52,12 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+            shape: const ContinuousRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+          )),
           dialogTheme: const DialogTheme(
             shape: ContinuousRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
           )
