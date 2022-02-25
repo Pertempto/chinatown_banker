@@ -1,9 +1,8 @@
+import 'package:chinatown_banker/views/result_item.dart';
 import 'package:flutter/material.dart';
 
 import '../models/game.dart';
 import '../models/player.dart';
-import 'item.dart';
-import 'player_token.dart';
 
 class GameResults extends StatefulWidget {
   final Game game;
@@ -16,7 +15,8 @@ class GameResults extends StatefulWidget {
 
 class _GameResultsState extends State<GameResults> {
   late Game game = widget.game;
-  late List<bool> isShowing = List.generate(game.players.length, (index) => false);
+  late List<bool> isShowing =
+      List.generate(game.players.length, (index) => false);
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +27,7 @@ class _GameResultsState extends State<GameResults> {
     );
     return Scaffold(
       appBar: AppBar(title: const Text('Results')),
+      backgroundColor: Colors.grey.shade300,
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
@@ -36,29 +37,10 @@ class _GameResultsState extends State<GameResults> {
             children: [
               ...List.generate(sortedPlayers.length, (index) {
                 Player player = sortedPlayers[index];
-                return Item(
-                  leading: isShowing[index]
-                      ? PlayerToken(player: player)
-                      : Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            '#${index + 1}',
-                            style: textTheme.headline5,
-                          ),
-                        ),
-                  title: isShowing[index] ? player.name : "Tap to show",
-                  trailing: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      isShowing[index] ? "\$${game.playerCash(player)}k" : "?",
-                      style: textTheme.headline4,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      isShowing[index] = true;
-                    });
-                  },
+                return ResultItem(
+                  number: index + 1,
+                  player: player,
+                  cash: game.playerCash(player),
                 );
               }),
             ],
