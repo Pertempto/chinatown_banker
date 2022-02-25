@@ -48,7 +48,7 @@ class _GamePlayersViewState extends State<GamePlayersView> {
                     if (game.isPlaying)
                       TextButton(
                           onPressed: game.completeYear,
-                          child: const Text('Next Year')),
+                          child: const Text('Year Complete')),
                     if (game.isComplete)
                       TextButton(
                           onPressed: _showFinalResults,

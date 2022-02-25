@@ -406,6 +406,8 @@ class _NewTradeState extends State<NewTrade> {
       {required String title,
       required Iterable<int> options,
       required Function(int) callback}) {
+    List<int> propertyNumbers = options.toList();
+    propertyNumbers.sort();
     showDialog(
         context: context,
         builder: (context) {
@@ -417,7 +419,7 @@ class _NewTradeState extends State<NewTrade> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                ...options.map((propertyNumber) => PropertyNumberItem(
+                ...propertyNumbers.map((propertyNumber) => PropertyNumberItem(
                       propertyNumber: propertyNumber,
                       onTap: () {
                         Navigator.of(context).pop();

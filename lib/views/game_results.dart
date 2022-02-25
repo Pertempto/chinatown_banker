@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/game.dart';
 import '../models/player.dart';
 import 'item.dart';
+import 'player_token.dart';
 
 class GameResults extends StatefulWidget {
   final Game game;
@@ -15,8 +16,7 @@ class GameResults extends StatefulWidget {
 
 class _GameResultsState extends State<GameResults> {
   late Game game = widget.game;
-  late List<bool> isShowing =
-      List.generate(game.players.length, (index) => false);
+  late List<bool> isShowing = List.generate(game.players.length, (index) => false);
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +37,15 @@ class _GameResultsState extends State<GameResults> {
               ...List.generate(sortedPlayers.length, (index) {
                 Player player = sortedPlayers[index];
                 return Item(
-                  leading: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      '#${index + 1}',
-                      style: textTheme.headline5,
-                    ),
-                  ),
+                  leading: isShowing[index]
+                      ? PlayerToken(player: player)
+                      : Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            '#${index + 1}',
+                            style: textTheme.headline5,
+                          ),
+                        ),
                   title: isShowing[index] ? player.name : "Tap to show",
                   trailing: Padding(
                     padding: const EdgeInsets.all(16),
